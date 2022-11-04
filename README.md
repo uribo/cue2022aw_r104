@@ -6,6 +6,9 @@
 
 > 身近なデータを題材に、データの見方を学びます。データを要約し、グラフで表現することで、意外な特徴を発見し、意思決定につなぐことができるようになります。また必修化された高校情報Iの内容を学ぶこともできます。
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/uribo/cue2022aw_r104/main?urlpath=rstudio)
+
+
 ## 講座の内容
 
 ### 第一週: 情報化社会におけるデータの利活用
