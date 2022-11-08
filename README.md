@@ -55,6 +55,8 @@
 
 ## データセット
 
+- 【独立行政法人統計センター】SSDSE（教育用標準データセット） https://www.nstac.go.jp/use/literacy/ssdse/
+
 ## テーマ
 
 ### カラーパレット
