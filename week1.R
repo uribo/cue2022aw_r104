@@ -57,6 +57,19 @@ download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.csv",
               # WindowsとUNIXとでパスの記述方法が異なるので注意
               destfile = "data-raw/SSDSE-B-2022.csv")
 
+# パッケージの利用 ----------------------------------------------------------------
+# 1. CRANに登録されているパッケージのインストール
+# RStudioでは`tab` の入力によってinstall.packages()関数の中でのパッケージ名の補完を行う
+install.packages("here")
+install.packages("remotes")
+# 2. GitHub上のパッケージの追加 <user名>/<repository名>
+remotes::install_github("uribo/ssdse")
+# 3. パッケージの読み込み
+library(here) # hereパッケージを利用可能にする
+here()
+# library()関数でパッケージを読み込まずにパッケージの関数を利用することもできる
+# 名前空間（パッケージ名と関数名）を<パッケージ名>::<関数名>の形で指定し、関数を直接実行する方法
+here::here()
 
 library(tibble)
 tibble::tibble(
