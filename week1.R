@@ -56,6 +56,8 @@ paste0("今日", "の", "天気", "は",
 download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.csv", 
               # WindowsとUNIXとでパスの記述方法が異なるので注意
               destfile = "data-raw/SSDSE-B-2022.csv")
+download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.xlsx", 
+              destfile = "data-raw/SSDSE-B-2022.xlsx")
 
 # パッケージの利用 ----------------------------------------------------------------
 # 1. CRANに登録されているパッケージのインストール
@@ -78,5 +80,18 @@ tibble::tibble(
 
 
 # 入出力 ---------------------------------------------------------------------
+library(readr)
+read_csv(here("data-raw/SSDSE-B-2022.csv"))
+read_csv(here("data-raw/SSDSE-B-2022.csv"), 
+         locale = locale(encoding = "cp932"))
+
+library(readxl)
+read_xlsx(here("data-raw/SSDSE-B-2022.xlsx"),
+          sheet = 1)
+
+library(ssdse)
+read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"),
+             lang = "ja")
+
 # read.table(pipe("pbpaste"), header = TRUE)
 
