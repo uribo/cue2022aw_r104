@@ -1,1 +1,1 @@
-R -e 'install.packages("renv"); install.packages("reprex"); install.packages("styler"); renv::restore()'
+R -e 'install.packages("renv"); renv::restore()'

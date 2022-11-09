@@ -4,5 +4,8 @@ options(
   reprex.highlight.font      = "HackGen35Nerd",
   reprex.highlight.font_size = 32
 )
-library(reprex)
-library(styler)
+if (Sys.info()[["user"]] %in% c("suryu", "suika")) {
+  library(reprex)
+  library(styler)  
+}
+
