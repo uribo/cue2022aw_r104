@@ -45,4 +45,7 @@ ggsave(filename = here::here("images/我が国のブロードバンドサービ�
 # webshot2::webshot("https://posit.co/download/rstudio-desktop/",
 #                   file = here::here("images/rstudio_install.png"),
 #                   selector = "section.download-content")
+# webshot2::webshot("https://www.nstac.go.jp/use/literacy/ssdse/",
+#                   file = here::here("images/ssdse.png"),
+#                   cliprect = "viewport")
 
