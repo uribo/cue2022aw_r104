@@ -4,5 +4,7 @@ options(
   reprex.highlight.font      = "HackGen35Nerd",
   reprex.highlight.font_size = 32
 )
-library(reprex)
-library(styler)
+if (!requireNamespace("reprex")) {
+  library(reprex)
+  library(styler)
+}
