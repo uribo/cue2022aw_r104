@@ -128,14 +128,32 @@ install.packages("tidyverse")
 # パッケージを読み込むといくつかのパッケージが同時に利用可能になる
 library(tidyverse)
 
-library(tibble)
-tibble::tibble(
-  a = 1
-)
+
+# 表形式のデータ（データフレーム） --------------------------------------------------------
+# データフレームの作成方法はいくつかあります
+# ここではtibble::tibble()関数を使う方法を紹介します
+# tibbleパッケージはtidyverseに含まれるので、個別にパッケージを読み込む必要はありません
+# library(tibble)
+df_zoo <-
+  tibble(
+    # 変数 = 値の形式でデータを記述します。
+    # 複数の値を扱うときは c()関数でベクトルを作ります
+    taxon = c("食肉類", "霊長類", "霊長類", "食肉類", "鳥類"),
+    name = c("レッサーパンダ", "チンパンジー", "マントヒヒ", "ライオン", "フンボルトペンギン"),
+    body_length_cm = c(63.5, 85, 80, 250, 69),
+    weight_kg = c(6, 60, 20, 225, 6))
+# 出力を確認しましょう
+# 一行目はデータフレームのサイズ（行と列の数）を示しています
+# 二行目は変数の名前、三行目は各変数のデータ型、三行目以降にデータを表示します
+df_zoo
 
 
-# 入出力 ---------------------------------------------------------------------
-library(readr)
+
+# 多様な表形式ファイルの読み込み ---------------------------------------------------------
+# readrパッケージはtidyverseに含まれるので、個別にパッケージを読み込む必要はありません
+# library(readr)
+read_csv(here("data-raw/tokushima_zoo_animals5.csv"))
+# ファイルによっては文字化けを起こすことがあります
 read_csv(here("data-raw/SSDSE-B-2022.csv"))
 read_csv(here("data-raw/SSDSE-B-2022.csv"), 
          locale = locale(encoding = "cp932"))
@@ -147,6 +165,9 @@ read_xlsx(here("data-raw/SSDSE-B-2022.xlsx"),
 library(ssdse)
 read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"),
              lang = "ja")
+
+write_csv(df_zoo,
+          here::here("data-raw/tokushima_zoo_animals5.csv"))
 
 # read.table(pipe("pbpaste"), header = TRUE)
 
