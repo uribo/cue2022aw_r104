@@ -77,9 +77,9 @@ paste0("今日", "の", "天気", "は",
 # destfile引数には保存する際のファイル名（パスを含むことができる）を指定する
 download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.csv", 
               # WindowsとUNIXとでパスの記述方法が異なるので注意
-              destfile = "data-raw/SSDSE-B-2022.csv")
+              destfile = here::here("data-raw/SSDSE-B-2022.csv"))
 download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.xlsx", 
-              destfile = "data-raw/SSDSE-B-2022.xlsx")
+              destfile = here::here("data-raw/SSDSE-B-2022.xlsx"))
 
 
 # ベクトル --------------------------------------------------------------------
@@ -97,10 +97,12 @@ c(1, 3, 5)[2] # ベクトル中の2番目の要素を参照
 # 名前付きの数値ベクトルを作成
 fruits <- 
   c(apple = 120, banana = 100, grape = 800)
+length(fruits) # 要素の数を表示
+names(fruits) # 要素に与えられた名前を出力
 fruits[1] # 要素の位置を指定して参照する
 fruits["grape"] # 要素の名前を指定して参照する
-fruits[["grape"]] # 値だけを参照する
-fruits[[1]]
+fruits[[1]]  # 値だけを参照する
+fruits[["grape"]]
 
 
 # パッケージの利用 ----------------------------------------------------------------
@@ -147,15 +149,32 @@ df_zoo <-
 # 二行目は変数の名前、三行目は各変数のデータ型、三行目以降にデータを表示します
 df_zoo
 
+# write_csv(df_zoo,
+#           here::here("data-raw/tokushima_zoo_animals5.csv"))
+
+
+# データフレーム中の要素の参照 ----------------------------------------------------------
+# $演算子、[[演算子を使った参照の返り値はベクトル
+df_zoo$name
+df_zoo[[1]]
+df_zoo[["name"]]
+# [演算子を使った参照では [行, 列]の形式となる
+# 返り値はデータフレーム
+df_zoo[2, ] # 2行目を表示
+df_zoo[, 3] # 3列目を表示
+df_zoo[, "name"] # name列を表示
+
 
 
 # 多様な表形式ファイルの読み込み ---------------------------------------------------------
 # readrパッケージはtidyverseに含まれるので、個別にパッケージを読み込む必要はありません
 # library(readr)
-read_csv(here("data-raw/tokushima_zoo_animals5.csv"))
+read_csv(file = here("data-raw/tokushima_zoo_animals5.csv"))
 # ファイルによっては文字化けを起こすことがあります
-read_csv(here("data-raw/SSDSE-B-2022.csv"))
+read_csv(here("data-raw/SSDSE-B-2022.csv"),
+         show_col_types = FALSE)
 read_csv(here("data-raw/SSDSE-B-2022.csv"), 
+         show_col_types = FALSE,
          locale = locale(encoding = "cp932"))
 
 library(readxl)
@@ -166,8 +185,22 @@ library(ssdse)
 read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"),
              lang = "ja")
 
-write_csv(df_zoo,
-          here::here("data-raw/tokushima_zoo_animals5.csv"))
-
 # read.table(pipe("pbpaste"), header = TRUE)
+
+
+# Rにおける連続した処理の記述 ----------------------------------------------------------
+# 1. 処理ごとにオブジェクトへ保存する
+r <- rnorm(100)
+d <- matrix(r, ncol = 2)
+plot(d)
+# 2. 処理内容を入れ子式に記述する
+plot(
+  matrix(
+    rnorm(100), 
+    ncol = 2))
+# 3. パイプ演算子を使う
+rnorm(100) |> 
+  matrix(ncol = 2) |> 
+  plot()
+
 
