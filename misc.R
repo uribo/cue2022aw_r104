@@ -40,8 +40,8 @@ ggsave(filename = here::here("images/我が国のブロードバンドサービ�
 
 
 # RとRStudioのインストール --------------------------------------------------------------------
-webshot2::webshot("https://cran.r-project.org/",
-                  file = here::here("images/cran.png"))
+# webshot2::webshot("https://cran.r-project.org/",
+#                   file = here::here("images/cran.png"))
 # webshot2::webshot("https://posit.co/download/rstudio-desktop/",
 #                   file = here::here("images/rstudio_install.png"),
 #                   selector = "section.download-content")
