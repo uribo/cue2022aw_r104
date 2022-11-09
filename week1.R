@@ -122,6 +122,12 @@ here()
 # 名前空間（パッケージ名と関数名）を<パッケージ名>::<関数名>の形で指定し、関数を直接実行する方法
 here::here()
 
+
+# tidyverse ---------------------------------------------------------------
+install.packages("tidyverse")
+# パッケージを読み込むといくつかのパッケージが同時に利用可能になる
+library(tidyverse)
+
 library(tibble)
 tibble::tibble(
   a = 1
