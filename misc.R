@@ -37,3 +37,12 @@ ggsave(filename = here::here("images/我が国のブロードバンドサービ�
        last_plot(),
        width = 7,
        height = 4)
+
+
+# RとRStudioのインストール --------------------------------------------------------------------
+webshot2::webshot("https://cran.r-project.org/",
+                  file = here::here("images/cran.png"))
+# webshot2::webshot("https://posit.co/download/rstudio-desktop/",
+#                   file = here::here("images/rstudio_install.png"),
+#                   selector = "section.download-content")
+
