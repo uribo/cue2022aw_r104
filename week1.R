@@ -195,15 +195,65 @@ read_csv(here("data-raw/SSDSE-B-2022.csv"),
          show_col_types = FALSE,
          locale = locale(encoding = "cp932"))
 
+
+# 表計算ソフトからの読み込み -----------------------------------------------------------
 library(readxl)
 read_xlsx(here("data-raw/SSDSE-B-2022.xlsx"),
           sheet = 1)
 
+
+# 個別のデータ読み込みに特化したパッケージの利用 -------------------------------------------------
 library(ssdse)
 read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"),
              lang = "ja")
 
-# read.table(pipe("pbpaste"), header = TRUE)
+# SSDSE-B-2022.xlsxを表計算ソフトで開き、適当な範囲を選択してコピーする
+# Rのコンソールで次のコマンドを実行
+# read.table("clipboard") # Windows
+# read.table(pipe("pbpaste"), header = TRUE) # macOS, Linux
+# dput()
+
+
+# データ可視化 ------------------------------------------------------------------
+# library(ragg)
+# agg_png(here("images/barplot.png"), width = 800, pointsize = 16)
+barplot(df_zoo$body_length_cm,
+        names.arg = df_zoo$name)
+# dev.off()
+
+# agg_png(here("images/scatterplot.png"), width = 800, pointsize = 16)
+plot(df_zoo$body_length_cm,
+     df_zoo$weight_kg)
+# dev.off()
+
+# agg_png(here("images/histogram.png"), width = 800, pointsize = 16)
+hist(df_zoo$weight_kg)
+# dev.off()
+
+
+# Rでの可視化を簡単に --------------------------------------------------------------
+theme_set(theme_bw(base_size = 16))
+ggplot(df_zoo,
+       aes(name, body_length_cm)) +
+  geom_bar(stat = "identity")
+# ggsave(here("images/barplot_ggplot2.png"),
+#        width = 8,
+#        height = 6)
+
+ggplot(df_zoo,
+       aes(body_length_cm, weight_kg)) +
+  geom_point()
+# ggsave(here("images/scatterplot_ggplot2.png"),
+#        width = 8,
+#        height = 6)
+
+ggplot(df_zoo,
+       aes(weight_kg)) +
+  geom_histogram(bins = 5)
+# ggsave(here("images/histogram_ggplot2.png"),
+#        width = 8,
+#        height = 6)
+
 
 
 # Rにおける連続した処理の記述 ----------------------------------------------------------
