@@ -14,9 +14,9 @@
 ### 第一週: 情報化社会におけるデータの利活用
 
 <p align="center">
-[スライド](https://github.com/uribo/cue2022aw_r104/blob/main/slide/week1.pdf) |
-[R入門スライド](https://speakerdeck.com/s_uryu/introduction-to-r) | 
-[Rスクリプト](https://github.com/uribo/cue2022aw_r104/blob/main/week1.R) 
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/slide/week1.pdf">スライド</a> |
+<a href="https://speakerdeck.com/s_uryu/introduction-to-r">R入門スライド</a> |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/week1.R">Rスクリプト</a>
 </p>
 
 - ビジネスにおけるデータ分析の重要性
