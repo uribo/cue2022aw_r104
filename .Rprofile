@@ -7,6 +7,6 @@ options(
 if (Sys.info()[["user"]] %in% c("suryu", "suika")) {
   library(reprex)
   library(styler)
-  library(ragg)
+  # library(ragg)
 }
 
