@@ -1,0 +1,2 @@
+libharfbuzz-dev
+libfribidi-dev

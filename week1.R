@@ -238,20 +238,20 @@ read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"),
 # )
 
 # データ可視化 ------------------------------------------------------------------
-# library(ragg)
-# agg_png(here("images/barplot.png"), width = 800, pointsize = 16)
+library(ragg)
+agg_png(here("images/barplot.png"), width = 800, pointsize = 16)
 barplot(df_zoo$body_length_cm,
         names.arg = df_zoo$name)
-# dev.off()
+dev.off()
 
-# agg_png(here("images/scatterplot.png"), width = 800, pointsize = 16)
+agg_png(here("images/scatterplot.png"), width = 800, pointsize = 16)
 plot(df_zoo$body_length_cm,
      df_zoo$weight_kg)
-# dev.off()
+dev.off()
 
-# agg_png(here("images/histogram.png"), width = 800, pointsize = 16)
+agg_png(here("images/histogram.png"), width = 800, pointsize = 16)
 hist(df_zoo$weight_kg)
-# dev.off()
+dev.off()
 
 
 # Rでの可視化を簡単に --------------------------------------------------------------
@@ -259,23 +259,23 @@ theme_set(theme_bw(base_size = 16))
 ggplot(df_zoo,
        aes(name, body_length_cm)) +
   geom_bar(stat = "identity")
-# ggsave(here("images/barplot_ggplot2.png"),
-#        width = 8,
-#        height = 6)
+ggsave(here("images/barplot_ggplot2.png"),
+       width = 8,
+       height = 6)
 
 ggplot(df_zoo,
        aes(body_length_cm, weight_kg)) +
   geom_point()
-# ggsave(here("images/scatterplot_ggplot2.png"),
-#        width = 8,
-#        height = 6)
+ggsave(here("images/scatterplot_ggplot2.png"),
+       width = 8,
+       height = 6)
 
 ggplot(df_zoo,
        aes(weight_kg)) +
   geom_histogram(bins = 5)
-# ggsave(here("images/histogram_ggplot2.png"),
-#        width = 8,
-#        height = 6)
+ggsave(here("images/histogram_ggplot2.png"),
+       width = 8,
+       height = 6)
 
 
 
