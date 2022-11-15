@@ -7,6 +7,9 @@ library(patchwork)
 library(ssdse)
 course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 
+df_animal <-
+  read_csv(here("data-raw/tokushima_zoo_animals5.csv"),
+           col_types = "ccdi")
 df_ssdse_b_raw <- 
   read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"), lang = "ja")
 df_ssdse_b <- 
@@ -38,6 +41,11 @@ df_ssdse_b2019 |>
 # library(ggbeeswarm)
 # library(ggdist)
 
+
+# データの要約 ------------------------------------------------------------------
+summary(df_animal)
+skimr::skim(df_animal)
+psych::describe(df_animal)
 
 
 # 共分散 ---------------------------------------------------------------------
