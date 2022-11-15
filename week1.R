@@ -155,7 +155,7 @@ library(tidyverse)
 # tibbleパッケージはtidyverseに含まれるので、個別にパッケージを読み込む必要はありません
 # library(tibble)
 # dfはdata frameを表します。dataやd、好きな名前にしてもよいですが、中身が推測しやすいものにしましょう
-df_zoo <-
+df_animal <-
   tibble(
     # 変数 = 値の形式でデータを記述します。
     # 複数の値を扱うときは c()関数でベクトルを作ります
@@ -166,22 +166,22 @@ df_zoo <-
 # 出力を確認しましょう
 # 一行目はデータフレームのサイズ（行と列の数）を示しています
 # 二行目は変数の名前、三行目は各変数のデータ型、三行目以降にデータを表示します
-df_zoo
+df_animal
 
-# write_csv(df_zoo,
+# write_csv(df_animal,
 #           here::here("data-raw/tokushima_zoo_animals5.csv"))
 
 
 # データフレーム中の要素の参照 ----------------------------------------------------------
 # $演算子、[[演算子を使った参照の返り値はベクトル
-df_zoo$name
-df_zoo[[1]]
-df_zoo[["name"]]
+df_animal$name
+df_animal[[1]]
+df_animal[["name"]]
 # [演算子を使った参照では [行, 列]の形式となる
 # 返り値はデータフレーム
-df_zoo[2, ] # 2行目を表示
-df_zoo[, 3] # 3列目を表示
-df_zoo[, "name"] # name列を表示
+df_animal[2, ] # 2行目を表示
+df_animal[, 3] # 3列目を表示
+df_animal[, "name"] # name列を表示
 
 
 
@@ -241,37 +241,37 @@ read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"),
 # データ可視化 ------------------------------------------------------------------
 library(ragg)
 agg_png(here("images/barplot.png"), width = 800, pointsize = 16)
-barplot(df_zoo$body_length_cm,
-        names.arg = df_zoo$name)
+barplot(df_animal$body_length_cm,
+        names.arg = df_animal$name)
 dev.off()
 
 agg_png(here("images/scatterplot.png"), width = 800, pointsize = 16)
-plot(df_zoo$body_length_cm,
-     df_zoo$weight_kg)
+plot(df_animal$body_length_cm,
+     df_animal$weight_kg)
 dev.off()
 
 agg_png(here("images/histogram.png"), width = 800, pointsize = 16)
-hist(df_zoo$weight_kg)
+hist(df_animal$weight_kg)
 dev.off()
 
 
 # Rでの可視化を簡単に --------------------------------------------------------------
 theme_set(theme_bw(base_size = 16))
-ggplot(df_zoo,
+ggplot(df_animal,
        aes(name, body_length_cm)) +
   geom_bar(stat = "identity")
 ggsave(here("images/barplot_ggplot2.png"),
        width = 8,
        height = 6)
 
-ggplot(df_zoo,
+ggplot(df_animal,
        aes(body_length_cm, weight_kg)) +
   geom_point()
 ggsave(here("images/scatterplot_ggplot2.png"),
        width = 8,
        height = 6)
 
-ggplot(df_zoo,
+ggplot(df_animal,
        aes(weight_kg)) +
   geom_histogram(bins = 5)
 ggsave(here("images/histogram_ggplot2.png"),
