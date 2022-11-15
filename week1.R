@@ -154,6 +154,7 @@ library(tidyverse)
 # ここではtibble::tibble()関数を使う方法を紹介します
 # tibbleパッケージはtidyverseに含まれるので、個別にパッケージを読み込む必要はありません
 # library(tibble)
+# dfはdata frameを表します。dataやd、好きな名前にしてもよいですが、中身が推測しやすいものにしましょう
 df_zoo <-
   tibble(
     # 変数 = 値の形式でデータを記述します。
