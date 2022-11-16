@@ -14,7 +14,7 @@ library(here)
 renv::settings$ignored.packages(unique(c(renv::settings$ignored.packages(), c("estatapi", "httr2"))))
 fs::dir_create(here("data-raw/家計調査"))
 if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4件_品目_米.csv")) == FALSE) {
-  if (length(fs::dir_ls(here("data-raw/家計調査"), regexp = ".(xls|xlsx)$")) == 36L) {
+  if (length(fs::dir_ls(here("data-raw/家計調査"), regexp = ".(xls|xlsx)$")) != 36L) {
     
     if (Sys.getenv("ESTAT_TOKEN") == "") {
       Sys.setenv("ESTAT_TOKEN") <- rstudioapi::askForPassword("e-statのtokenを入力してください")
@@ -208,6 +208,7 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
                          paste(cities,
                                rep(c("100世帯当たり", "複数単位"), times = length(cities)/2),
                                sep = "_")))
+  }
     
     # d <- 
     #   readxl::read_xlsx(here("data-raw/家計調査/4-1_都市階級・地方・都道府県庁所在市別_二人以上の世帯・勤労者世帯・無職世帯_202102.xlsx"),
@@ -243,8 +244,8 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
                           names_pattern = "(.*)_(.*_.*)",
                           values_to = "value") |> 
       # year and month ... ym 年月
-      purrr::set_names(c("ym", "都道府県庁所在市", "項目", "value")) |> 
-      mutate(ym = stringr::str_remove_all(basename(ym), "(.+_|.xls|.xlsx)")) |> 
+      purrr::set_names(c("ym", "品目分類", "都道府県庁所在市", "項目", "value")) |> 
+      mutate(ym = stringr::str_remove_all(basename(ym), "(.+_|.xlsx)")) |> 
       tidyr::separate(都道府県庁所在市,
                       into = c("市区町村コード", "市"),
                       sep = "_")
@@ -265,8 +266,8 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
                           names_pattern = "(.*)_(.*_.*)",
                           values_to = "value") |> 
       # year and month ... ym 年月
-      purrr::set_names(c("ym", "都道府県庁所在市", "項目", "value")) |> 
-      mutate(ym = stringr::str_remove_all(basename(ym), "(.+_|.xls|.xlsx)")) |> 
+      purrr::set_names(c("ym", "品目分類", "都道府県庁所在市", "項目", "value")) |> 
+      mutate(ym = stringr::str_remove_all(basename(ym), "(.+_|.xls)")) |> 
       tidyr::separate(都道府県庁所在市,
                       into = c("市区町村コード", "市"),
                       sep = "_")
@@ -280,7 +281,6 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
     
     df_shikoku_kome_sisyutu2019to2021 |> 
       readr::write_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4件_品目_米.csv"))
-  }
 }
 
 
