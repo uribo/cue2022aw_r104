@@ -161,7 +161,9 @@ anscombe_long |>
                   se = FALSE, 
                   color = course_colors[2])) |> 
   wrap_plots(ncol = 4)
-
+# ggsave(here("images/anscombes_quartet.png"),
+#        width = 7,
+#        height = 2.2)
 
 # アンスコムサウルス -------------------------------------------------------------------
 library(datasauRus)
@@ -169,12 +171,19 @@ datasaurus_dozen |>
   filter(dataset == "dino") |> 
   ggplot(aes(x = x, y = y)) +
   geom_point()
+# ggsave(here("images/datasaurus.png"),
+#        width = 5,
+#        height = 4)
+
 datasaurus_dozen |> 
   filter(dataset != "dino") |> 
   ggplot(aes(x = x, y = y, colour = dataset)) +
   geom_point() +
   theme(legend.position = "none") +
   facet_wrap(~dataset, ncol = 3)
+# ggsave(here("images/several_datasaurus.png"),
+#        width = 5,
+#        height = 6)
 datasaurus_dozen |> 
   group_by(dataset) |> 
   summarise(across(.cols = c(x, y), .fns = list(mean = mean, sd = sd)),
