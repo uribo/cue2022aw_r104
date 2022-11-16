@@ -33,6 +33,47 @@ df_ssdse_b2019 <-
   filter(`年度` == 2019)
 # glimpse(df_ssdse_b2019)
 
+df_icecream_temperature <- 
+  df_shikoku_kome_sisyutu2019to2021 |> 
+  filter(`市` == "徳島市",
+         `品目分類` == "アイスクリーム・シャーベット",
+         `項目` == "購入頻度_100世帯当たり") |> 
+  select(ym, `項目`, value) |> 
+  left_join(
+    df_shikoku_weather2019to2021 |> 
+      filter(station_name == "徳島") |> 
+      transmute(ym = str_c(year,
+                           str_pad(month, width = 2, pad = "0")),
+                temperature_average_c),
+    by = "ym")
+
+df_pesticide_ice <- 
+  df_shikoku_kome_sisyutu2019to2021 |> 
+  filter(`市` == "徳島市",
+         `項目` == "購入頻度_100世帯当たり",
+         `品目分類` == "殺虫・防虫剤") |> 
+  select(ym, pesticide = value) |> 
+  left_join(
+    df_shikoku_kome_sisyutu2019to2021 |> 
+      filter(`市` == "徳島市",
+             `項目` == "購入頻度_100世帯当たり",
+             `品目分類` == "アイスクリーム・シャーベット") |> 
+      select(ym, ice = value),
+    by = "ym") |> 
+  left_join(
+    df_shikoku_weather2019to2021 |> 
+      filter(station_name == "徳島") |> 
+      transmute(ym = str_c(year,
+                           str_pad(month, width = 2, pad = "0")),
+                temperature_average_c),
+    by = "ym")
+
+anscombe_long <- 
+  anscombe |> 
+  tidyr::pivot_longer(
+    tidyselect::everything(),
+    names_to = c(".value", "set"),
+    names_pattern = "(.)(.)")
 
 # データの種類 ------------------------------------------------------------------
 # 問題: 次のデータの各変数はどの尺度水準に分類されるか
@@ -95,20 +136,7 @@ psych::describe(df_animal)
 # 共分散 ---------------------------------------------------------------------
 
 # 相関係数 --------------------------------------------------------------------
-df_icecream_temperature <- 
-  df_shikoku_kome_sisyutu2019to2021 |> 
-  filter(`市` == "徳島市",
-         `品目分類` == "アイスクリーム・シャーベット",
-         `項目` == "購入頻度_100世帯当たり") |> 
-  select(ym, `項目`, value) |> 
-  left_join(
-    df_shikoku_weather2019to2021 |> 
-      filter(station_name == "徳島") |> 
-      transmute(ym = str_c(year,
-                           str_pad(month, width = 2, pad = "0")),
-                temperature_average_c),
-    by = "ym")
-
+# 2つの変数の関係を散布図で表す
 df_icecream_temperature |> 
   ggplot() +
   aes(temperature_average_c, value) +
@@ -119,32 +147,13 @@ df_icecream_temperature |>
        caption = "データ: 気象庁 過去の気象データおよび
        「家計調査」表番号4-1
        1世帯当たり1か月間の支出金額，購入数量及び平均価格 都市階級・地方・都道府県庁所在市別")
+
+# 気温とアイスの相関係数を求める
 cor(df_icecream_temperature$temperature_average_c,
     df_icecream_temperature$value)
 
 
 # 見せかけの相関（疑似相関） -----------------------------------------------------------
-df_pesticide_ice <- 
-  df_shikoku_kome_sisyutu2019to2021 |> 
-  filter(`市` == "徳島市",
-         `項目` == "購入頻度_100世帯当たり",
-         `品目分類` == "殺虫・防虫剤") |> 
-  select(ym, pesticide = value) |> 
-  left_join(
-    df_shikoku_kome_sisyutu2019to2021 |> 
-      filter(`市` == "徳島市",
-             `項目` == "購入頻度_100世帯当たり",
-             `品目分類` == "アイスクリーム・シャーベット") |> 
-      select(ym, ice = value),
-    by = "ym") |> 
-  left_join(
-    df_shikoku_weather2019to2021 |> 
-      filter(station_name == "徳島") |> 
-      transmute(ym = str_c(year,
-                           str_pad(month, width = 2, pad = "0")),
-                temperature_average_c),
-    by = "ym")
-
 # 「殺虫・防虫剤」と「アイスクリーム・シャーベット」の購入頻度の間には正の相関
 cor(df_pesticide_ice$pesticide,
     df_pesticide_ice$ice)
@@ -202,14 +211,8 @@ vis_cor(df_pesticide_ice[, 2:4])
 
 
 # アンスコムの例 -----------------------------------------------------------------
-anscombe
-
-anscombe_long <- 
-  anscombe |> 
-  tidyr::pivot_longer(
-    tidyselect::everything(),
-    names_to = c(".value", "set"),
-    names_pattern = "(.)(.)")
+anscombe # Rの組み込みパッケージ datasets によりアンスコムの例のデータが利用できます
+anscombe_long # アンスコムデータを縦長の形にしたもの
 # 記述統計量（平均と分散）の算出
 # setがデータセットの種類を示します
 # set間で値に大きな差はありません
