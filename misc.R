@@ -1,6 +1,7 @@
 library(dplyr)
 library(ggplot2)
 library(ggrepel)
+library(patchwork)
 theme_set(theme_bw())
 # 【総務省】我が国のインターネットにおけるトラヒックの集計・試算 -----------------------------------------
 # https://www.soumu.go.jp/joho_tsusin/eidsystem/market01_05_03.html
@@ -52,3 +53,36 @@ ggsave(filename = here::here("images/我が国のブロードバンドサービ�
 #                   file = here::here("images/ssdse.png"),
 #                   cliprect = "viewport")
 
+
+# 相関 ----------------------------------------------------------------------
+set.seed(123)
+df_corr <- 
+  tibble::tibble(
+    x = rnorm(100),
+    y = rnorm(100),
+    y_positive = 5 * x + rnorm(100, sd = 3),
+    y_negative = -5 * x + rnorm(100, sd = 4))
+p1 <- 
+  df_corr |> 
+  ggplot(aes(x, y_positive)) +
+  geom_point() +
+  ylab("y") +
+  labs(title = "正の相関関係")
+p2 <- 
+  df_corr |>  
+  ggplot(aes(x, y)) +
+  geom_point() +
+  labs(title = "無相関")
+p3 <- 
+  df_corr |> 
+  ggplot(aes(x, y_negative)) +
+  geom_point() +
+  ylab("y") +
+  labs(title = "負の相関関係")
+p1 + p2 + p3 + 
+  plot_layout(ncol = 3)
+
+ggsave(filename = here::here("images/2つの変数の関係を示す3つの状態.png"), 
+       last_plot(),
+       width = 7,
+       height = 2.6)
