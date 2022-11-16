@@ -1,2 +1,3 @@
 libharfbuzz-dev
 libfribidi-dev
+libudunits2-dev
