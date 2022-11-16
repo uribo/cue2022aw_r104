@@ -153,6 +153,17 @@ df_icecream_temperature |>
 # 気温とアイスの相関係数を求める
 cor(df_icecream_temperature$temperature_average_c,
     df_icecream_temperature$value)
+# 相関係数は外れ値の影響を受けやすい
+cor(df_animal$body_length_cm,
+    df_animal$weight_kg,
+    use = "complete.obs")
+cor(df_animal |> 
+      filter(!heavy_mt_200kg) |> 
+      pull(body_length_cm),
+    df_animal |> 
+      filter(!heavy_mt_200kg) |> 
+      pull(weight_kg),
+    use = "complete.obs")
 
 
 # 見せかけの相関（疑似相関） -----------------------------------------------------------
