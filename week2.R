@@ -14,7 +14,9 @@ course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 # データの準備 ------------------------------------------------------------------
 df_animal <-
   read_csv("https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv",
-                  col_types = "ccdd")
+                  col_types = "ccdd") |> 
+  # 体重が200kg以上の場合にTRUE
+  mutate(heavy_mt_200kg = weight_kg > 200)
 df_shikoku_kome_sisyutu2019to2021 <-
   read_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県.csv"),
            col_types = "cccccd")
@@ -101,13 +103,13 @@ df_animal |>
   aes(body_length_cm, weight_kg) +
   geom_point() +
   geom_text_repel(data = df_animal |> 
-                    filter(weight_kg > 200),
+                    filter(heavy_mt_200kg == TRUE),
                   aes(label = name))
 # 動物データ全体での体重の平均
 mean(df_animal$body_length_cm, na.rm = TRUE)
 # 大きな3種を含めないで体重の平均値を求めると結果が大きく異なる
 mean(df_animal |> 
-       filter(weight_kg <= 200) |> 
+       filter(heavy_mt_200kg == FALSE) |> 
        pull(body_length_cm), na.rm = TRUE)
 
 # 東京都の人口は外れ値？
@@ -199,14 +201,19 @@ df_pesticide_ice |>
 
 
 # 相関係数行列 ------------------------------------------------------------------
-library(corrr)
-correlate(df_pesticide_ice, diagonal = 1.0)
-
+# 変数のペアごとに計算した相関係数を行列形式で表現します
+# 対角成分は、自分自身との相関に対応するので値は1になる
+# corrr::correlate()関数では対角成分はNAで出力されますが、引数diagonalで任意の値（1）に変更できます
+corrr::correlate(df_pesticide_ice, diagonal = 1.0)
+# visdatパッケージを使った相関係数行列の視覚化
 vis_cor(df_pesticide_ice[, 2:4])
 
 
 # クロス集計表 ------------------------------------------------------------------
-
+xtabs(~ taxon + heavy_mt_200kg, 
+      data = df_animal)
+df_animal |> 
+  janitor::tabyl(taxon, heavy_mt_200kg)
 
 
 
