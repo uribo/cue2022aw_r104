@@ -121,6 +121,43 @@ df_icecream_temperature |>
 cor(df_icecream_temperature$temperature_average_c,
     df_icecream_temperature$value)
 
+
+# 見せかけの相関（疑似相関） -----------------------------------------------------------
+df_pesticide_ice <- 
+  df_shikoku_kome_sisyutu2019to2021 |> 
+  filter(`市` == "徳島市",
+         `項目` == "購入頻度_100世帯当たり",
+         `品目分類` == "殺虫・防虫剤") |> 
+  select(ym, pesticide = value) |> 
+  left_join(
+    df_shikoku_kome_sisyutu2019to2021 |> 
+      filter(`市` == "徳島市",
+             `項目` == "購入頻度_100世帯当たり",
+             `品目分類` == "アイスクリーム・シャーベット") |> 
+      select(ym, ice = value),
+    by = "ym")
+
+# 「殺虫・防虫剤」と「アイスクリーム・シャーベット」の購入頻度の間には正の相関
+cor(df_pesticide_ice$pesticide,
+    df_pesticide_ice$ice)
+
+df_pesticide_ice |>
+  mutate(season = case_when(
+    str_detect(ym, "(12|01|02)$") ~ "winter",
+    str_detect(ym, "(03|04|05)$") ~ "spring",
+    str_detect(ym, "(06|07|08)$") ~ "summer",
+    str_detect(ym, "(09|10|11)$") ~ "autumn",
+  )) |> 
+  ggplot() +
+  aes(ice, pesticide, color = season) +
+  geom_point()
+
+df_pesticide_ice |> 
+  pivot_longer(cols = c(pesticide, ice)) |> 
+  ggplot() +
+  aes(ym, value, group = name, fill = name) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = course_colors[1:2])
 # クロス集計表 ------------------------------------------------------------------
 
 

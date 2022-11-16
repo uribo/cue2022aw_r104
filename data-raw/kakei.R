@@ -235,7 +235,7 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
       purrr::map_dfr(
         function(.x) {
           read_kakei_4_1xlsx_sheet2(.x) |> 
-            filter(`品目分類` %in% c("米", "アイスクリーム・シャーベット")) |> 
+            filter(`品目分類` %in% c("米", "アイスクリーム・シャーベット", "殺虫・防虫剤")) |> 
             select(`品目分類`, matches("(徳島|高松|松山|高知)市"))
         },
         .id = "file") |> 
@@ -248,17 +248,17 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
       mutate(ym = stringr::str_remove_all(basename(ym), "(.+_|.xlsx)")) |> 
       tidyr::separate(都道府県庁所在市,
                       into = c("市区町村コード", "市"),
-                      sep = "_")
+                      sep = "_") |> 
+      ensurer::ensure(nrow(.) == 336)
     
     df_shikoku_kome_sisyutu2 <- 
       fs::dir_ls(here("data-raw/家計調査/"), 
                  regexp = ".xls$") |>
       ensurer::ensure(length(.) == 22L) |> 
-      head(2) |> 
       purrr::map_dfr(
         function(.x) {
           read_kakei_4_1xlsx_sheet2_old(.x) |> 
-            filter(`品目分類` %in% c("米", "アイスクリーム・シャーベット")) |> 
+            filter(`品目分類` %in% c("米", "アイスクリーム・シャーベット", "殺虫・防虫剤")) |> 
             select(`品目分類`, matches("(徳島|高松|松山|高知)市"))
         },
         .id = "file") |> 
@@ -271,7 +271,8 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
       mutate(ym = stringr::str_remove_all(basename(ym), "(.+_|.xls)")) |> 
       tidyr::separate(都道府県庁所在市,
                       into = c("市区町村コード", "市"),
-                      sep = "_")
+                      sep = "_") |> 
+      ensurer::ensure(nrow(.) == 528)
     
     df_shikoku_kome_sisyutu2019to2021 <- 
       df_shikoku_kome_sisyutu |> 
