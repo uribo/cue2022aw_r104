@@ -12,6 +12,7 @@ course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 
 
 # データの準備 ------------------------------------------------------------------
+# 動物データ
 df_animal <-
   read_csv("https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv",
                   col_types = "ccdd") |> 
@@ -90,11 +91,23 @@ df_ssdse_b2019 |>
 
 
 # 欠損値 ---------------------------------------------------------------------
+# 動物データの各列にどれだけ欠損を含むか
 df_animal |> 
-  purrr::map_dbl(~ sum(is.na(.x))) |> 
-  unname()
+  purrr::map_dbl(~ sum(is.na(.x)))
+# Rでは欠損はNAとして記録される
+df_animal$body_length_cm
+c(NA, 1)
+is.na(c(NA, 1))
+# 欠損値を処理しない場合には、統計的計算処理が不可能になることがある
+sum(df_animal$body_length_cm)
+mean(df_animal$body_length_cm)
+# Rではそのような統計的計算処理を行う関数には、欠損値を除いて処理を行うためのオプションが用意される
+# na.rm = TRUE を指定すると欠損値を除外して処理が行われる
+sum(df_animal$body_length_cm, na.rm = TRUE)
+mean(df_animal$body_length_cm, na.rm = TRUE)
 
-
+# visdatパッケージを使った欠損値の視覚化
+vis_miss(df_animal)
 
 # 外れ値 ---------------------------------------------------------------------
 # 動物のデータではホッキョクグマ、ライオン、シロオリックスが他の動物と比べて大きい
@@ -118,15 +131,27 @@ df_ssdse_b2019 |>
   aes(forcats::fct_reorder(`都道府県`, `総人口`), `総人口`) +
   geom_bar(stat = "identity") +
   coord_flip()
-# 東京都の人口は外れ値？
-# 箱ひげ図での確認
-df_ssdse_b2019 |> 
-  ggplot() +
-  aes(y = `総人口`) +
-  geom_boxplot()
-# 箱ひげ図の発展系... 
-# library(ggbeeswarm)
-# library(ggdist)
+
+# 平均値
+x <- c(1, 10, 5, 3, 7)
+sum(x) / length(x)
+# mean()関数を用いて平均値を計算します
+mean(x)
+# 中央値
+sort(x)[ceiling(length(x)/2)]
+median(x)
+# 要素の数が偶数のときの中央値
+x <- sort(c(1, 2, 4, 6))
+(x[length(x)/2] + rev(x)[length(x)/2]) / 2
+# median()関数で数値ベクトルの中央値を計算できます
+median(x)
+# 最頻値
+x <- c(1, 3, 3, 5, 5, 5, 7, 10)
+as.numeric(names(which.max(table(x))))
+
+
+# 四分位 --------------------------------------------------------------------
+quantile(df_animal$weight_kg, na.rm = TRUE)
 
 
 # データの要約 ------------------------------------------------------------------
@@ -298,6 +323,16 @@ datasaurus_dozen |>
 
 # 箱ひげ図 --------------------------------------------------------------------
 quantile(df_ssdse_b2019$`総人口`)
+
+# 東京都の人口は外れ値？
+# 箱ひげ図での確認
+df_ssdse_b2019 |> 
+  ggplot() +
+  aes(y = `総人口`) +
+  geom_boxplot()
+# 箱ひげ図の発展系... 
+# library(ggbeeswarm)
+# library(ggdist)
 
 # 棒グラフ --------------------------------------------------------------------
 # 縦にする、軸にだまされない
