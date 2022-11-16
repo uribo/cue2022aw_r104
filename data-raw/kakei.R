@@ -235,11 +235,11 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
       purrr::map_dfr(
         function(.x) {
           read_kakei_4_1xlsx_sheet2(.x) |> 
-            filter(`品目分類` == "米") |> 
-            select(matches("(徳島|高松|松山|高知)市"))
+            filter(`品目分類` %in% c("米", "アイスクリーム・シャーベット")) |> 
+            select(`品目分類`, matches("(徳島|高松|松山|高知)市"))
         },
         .id = "file") |> 
-      tidyr::pivot_longer(cols = 2:9,
+      tidyr::pivot_longer(cols = 3:10,
                           names_to = c("都道府県庁所在市", "項目"),
                           names_pattern = "(.*)_(.*_.*)",
                           values_to = "value") |> 
@@ -254,14 +254,15 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
       fs::dir_ls(here("data-raw/家計調査/"), 
                  regexp = ".xls$") |>
       ensurer::ensure(length(.) == 22L) |> 
+      head(2) |> 
       purrr::map_dfr(
         function(.x) {
           read_kakei_4_1xlsx_sheet2_old(.x) |> 
-            filter(`品目分類` == "米") |> 
-            select(matches("(徳島|高松|松山|高知)市"))
+            filter(`品目分類` %in% c("米", "アイスクリーム・シャーベット")) |> 
+            select(`品目分類`, matches("(徳島|高松|松山|高知)市"))
         },
         .id = "file") |> 
-      tidyr::pivot_longer(cols = 2:9,
+      tidyr::pivot_longer(cols = 3:10,
                           names_to = c("都道府県庁所在市", "項目"),
                           names_pattern = "(.*)_(.*_.*)",
                           values_to = "value") |> 
@@ -275,12 +276,10 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
     df_shikoku_kome_sisyutu2019to2021 <- 
       df_shikoku_kome_sisyutu |> 
       bind_rows(df_shikoku_kome_sisyutu2) |> 
-      mutate(`品目分類` = "米") |> 
-      relocate(`品目分類`, .after = 1) |> 
-      arrange(ym, `市区町村コード`, `項目`)
+      arrange(ym, `市区町村コード`, `品目分類`, `項目`)
     
     df_shikoku_kome_sisyutu2019to2021 |> 
-      readr::write_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4件_品目_米.csv"))
+      readr::write_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県.csv"))
 }
 
 
