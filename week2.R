@@ -7,6 +7,7 @@ library(patchwork)
 library(ssdse)
 library(units)
 library(ggrepel)
+library(visdat)
 course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 
 
@@ -30,7 +31,7 @@ df_ssdse_b <-
 df_ssdse_b2019 <- 
   df_ssdse_b |> 
   filter(`年度` == 2019)
-glimpse(df_ssdse_b2019)
+# glimpse(df_ssdse_b2019)
 
 
 # データの種類 ------------------------------------------------------------------
@@ -46,9 +47,10 @@ df_ssdse_b2019 |>
 
 
 # 欠損値 ---------------------------------------------------------------------
-df_ssdse_b2019 |> 
+df_animal |> 
   purrr::map_dbl(~ sum(is.na(.x))) |> 
   unname()
+
 
 
 # 外れ値 ---------------------------------------------------------------------
@@ -93,7 +95,6 @@ psych::describe(df_animal)
 # 共分散 ---------------------------------------------------------------------
 
 # 相関係数 --------------------------------------------------------------------
-# library(corrr)
 df_icecream_temperature <- 
   df_shikoku_kome_sisyutu2019to2021 |> 
   filter(`市` == "徳島市",
@@ -135,6 +136,13 @@ df_pesticide_ice <-
              `項目` == "購入頻度_100世帯当たり",
              `品目分類` == "アイスクリーム・シャーベット") |> 
       select(ym, ice = value),
+    by = "ym") |> 
+  left_join(
+    df_shikoku_weather2019to2021 |> 
+      filter(station_name == "徳島") |> 
+      transmute(ym = str_c(year,
+                           str_pad(month, width = 2, pad = "0")),
+                temperature_average_c),
     by = "ym")
 
 # 「殺虫・防虫剤」と「アイスクリーム・シャーベット」の購入頻度の間には正の相関
@@ -179,6 +187,14 @@ df_pesticide_ice |>
 # ggsave(here("images/ts_ice_and_pesticide_purchase.png"),
 #        width = 7,
 #        height = 4)
+
+
+# 相関係数行列 ------------------------------------------------------------------
+library(corrr)
+correlate(df_pesticide_ice, diagonal = 1.0)
+
+vis_cor(df_pesticide_ice[, 2:4])
+
 
 # クロス集計表 ------------------------------------------------------------------
 
