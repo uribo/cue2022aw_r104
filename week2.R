@@ -142,22 +142,44 @@ cor(df_pesticide_ice$pesticide,
     df_pesticide_ice$ice)
 
 df_pesticide_ice |>
-  mutate(season = case_when(
-    str_detect(ym, "(12|01|02)$") ~ "winter",
-    str_detect(ym, "(03|04|05)$") ~ "spring",
-    str_detect(ym, "(06|07|08)$") ~ "summer",
-    str_detect(ym, "(09|10|11)$") ~ "autumn",
-  )) |> 
   ggplot() +
-  aes(ice, pesticide, color = season) +
-  geom_point()
+  aes(ice, pesticide) +
+  geom_point() +
+  xlab("「アイスクリーム・シャーベット」") +
+  ylab("「殺虫・防虫剤」") +
+  labs(title = "徳島市における「殺虫・防虫剤」と「アイスクリーム・シャーベット」の\n100世帯当たりの購入頻度",
+       caption = "データ: 「家計調査」表番号4-1
+       1世帯当たり1か月間の支出金額，購入数量及び平均価格 都市階級・地方・都道府県庁所在市別") +
+  theme(title = element_text(size = 6))
+# ggsave(here("images/relationships_for_ice_and_pesticide.png"),
+#        width = 5,
+#        height = 4)
 
 df_pesticide_ice |> 
   pivot_longer(cols = c(pesticide, ice)) |> 
+  mutate(ym = lubridate::ym(ym),
+         name = case_when(
+           name == "pesticide" ~ "殺虫・防虫剤",
+           name == "ice" ~ "アイスクリーム・シャーベット",
+         )) |> 
   ggplot() +
   aes(ym, value, group = name, fill = name) +
   geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = course_colors[1:2])
+  xlab(NULL) +
+  ylab("100世帯当たりの購入頻度") +
+  labs(title = "徳島市における「殺虫・防虫剤」と「アイスクリーム・シャーベット」の100世帯当たりの購入頻度",
+       caption = "データ: 「家計調査」表番号4-1
+       1世帯当たり1か月間の支出金額，購入数量及び平均価格 都市階級・地方・都道府県庁所在市別") +
+  scale_fill_manual(values = course_colors[1:2]) +
+  scale_x_date(labels = scales::label_date("%Y年%b", locale = "ja"),
+               date_breaks = "6 month") +
+  guides(fill = guide_legend(title = "")) +
+  theme(title = element_text(size = 6),
+        legend.position = "bottom")
+# ggsave(here("images/ts_ice_and_pesticide_purchase.png"),
+#        width = 7,
+#        height = 4)
+
 # クロス集計表 ------------------------------------------------------------------
 
 
