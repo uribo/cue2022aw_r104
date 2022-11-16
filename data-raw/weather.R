@@ -1,7 +1,7 @@
 ################################
 ################################
 # renv::install("uribo/jmastats")
-# renv::settings$ignored.packages(unique(c(renv::settings$ignored.packages(), "jmastats")))
+# renv::settings$ignored.packages(unique(c(renv::settings$ignored.packages(), "jmastats", "sf")))
 
 if (file.exists(here("data-raw/shikoku_weather2019to2021.csv")) == FALSE) {
   library(jmastats)

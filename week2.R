@@ -5,11 +5,21 @@ library(tidyverse)
 library(here)
 library(patchwork)
 library(ssdse)
+library(units)
+library(ggrepel)
 course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 
+
+# データの準備 ------------------------------------------------------------------
 df_animal <-
-  read_csv(here("data-raw/tokushima_zoo_animals5.csv"),
-           col_types = "ccdi")
+  read_csv("https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv",
+                  col_types = "ccdd")
+df_shikoku_kome_sisyutu2019to2021 <-
+  read_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県.csv"),
+           col_types = "cccccd")
+df_shikoku_weather2019to2021 <-
+  read_csv(here("data-raw/shikoku_weather2019to2021.csv"),
+           col_types = "iiccdd")
 df_ssdse_b_raw <- 
   read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"), lang = "ja")
 df_ssdse_b <- 
@@ -23,8 +33,40 @@ df_ssdse_b2019 <-
 glimpse(df_ssdse_b2019)
 
 
+# データの種類 ------------------------------------------------------------------
+# 問題: 次のデータの各変数はどの尺度水準に分類されるか
+# 四国4件の婚姻件数と婚姻率（2019年度）
+df_ssdse_b2019 |> 
+  filter(`都道府県` %in% c("徳島県", "香川県", "愛媛県", "高知県")) |> 
+  mutate(`人口順位` = as.numeric(fct_rev(fct_reorder(`都道府県`, `総人口`))),
+         `婚姻率_人口千人あたりの婚姻件数` =  (`婚姻件数` / `総人口`) * 1000) |> 
+  select(`年度`, `都道府県`, 
+         `総人口`,
+         `人口順位`, `婚姻件数`, `婚姻率_人口千人あたりの婚姻件数`)
+
+
+# 欠損値 ---------------------------------------------------------------------
+df_ssdse_b2019 |> 
+  purrr::map_dbl(~ sum(is.na(.x))) |> 
+  unname()
+
 
 # 外れ値 ---------------------------------------------------------------------
+# 動物のデータではホッキョクグマ、ライオン、シロオリックスが他の動物と比べて大きい
+df_animal |> 
+  ggplot() +
+  aes(body_length_cm, weight_kg) +
+  geom_point() +
+  geom_text_repel(data = df_animal |> 
+                    filter(weight_kg > 200),
+                  aes(label = name))
+# 動物データ全体での体重の平均
+mean(df_animal$body_length_cm, na.rm = TRUE)
+# 大きな3種を含めないで体重の平均値を求めると結果が大きく異なる
+mean(df_animal |> 
+       filter(weight_kg <= 200) |> 
+       pull(body_length_cm), na.rm = TRUE)
+
 # 東京都の人口は外れ値？
 df_ssdse_b2019 |> 
   ggplot() +
@@ -80,7 +122,32 @@ p3 <-
 p1 + p2 + p3 + 
   plot_layout(ncol = 3)
 
+df_icecream_temperature <- 
+  df_shikoku_kome_sisyutu2019to2021 |> 
+  filter(`市` == "徳島市",
+         `品目分類` == "アイスクリーム・シャーベット",
+         `項目` == "購入頻度_100世帯当たり") |> 
+  select(ym, `項目`, value) |> 
+  left_join(
+    df_shikoku_weather2019to2021 |> 
+      filter(station_name == "徳島") |> 
+      transmute(ym = str_c(year,
+                           str_pad(month, width = 2, pad = "0")),
+                temperature_average_c),
+    by = "ym")
 
+df_icecream_temperature |> 
+  ggplot() +
+  aes(temperature_average_c, value) +
+  geom_point() +
+  xlab("月平均気温(\u2103)") +
+  ylab("100世帯当たり購入頻度") +
+  labs(title = "徳島市における気温と「アイスクリーム・シャーベット」の購入頻度の関係",
+       caption = "データ: 気象庁 過去の気象データおよび
+       「家計調査」表番号4-1
+       1世帯当たり1か月間の支出金額，購入数量及び平均価格 都市階級・地方・都道府県庁所在市別")
+cor(df_icecream_temperature$temperature_average_c,
+    df_icecream_temperature$value)
 
 # クロス集計表 ------------------------------------------------------------------
 
