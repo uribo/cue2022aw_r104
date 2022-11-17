@@ -86,8 +86,13 @@ df_ssdse_b2019 |>
   mutate(`人口順位` = as.numeric(fct_rev(fct_reorder(`都道府県`, `総人口`))),
          `婚姻率_人口千人あたりの婚姻件数` =  (`婚姻件数` / `総人口`) * 1000) |> 
   select(`年度`, `都道府県`, 
-         `総人口`,
+         # `総人口`,
          `人口順位`, `婚姻件数`, `婚姻率_人口千人あたりの婚姻件数`)
+# 年度... 間隔尺度
+# 都道府県... 名義尺度
+# 人口順位... 順序尺度
+# 婚姻件数... 比例尺度
+# 婚姻率... 比例尺度
 
 
 # 欠損値 ---------------------------------------------------------------------
@@ -158,16 +163,23 @@ quantile(df_animal$weight_kg, na.rm = TRUE)
 # Rは分散を求める関数（不偏分散）がありますが、これまで使った関数や演算子を使って分散を求めてみましょう
 # 答え合わせは講座の中で
 # 1. 変数の平均値を求める
+mean(df_animal$body_length_cm, na.rm = TRUE)
 # 2. 変数の各値と平均値の差（偏差）を求める
+df_animal$body_length_cm[1] - mean(df_animal$body_length_cm, na.rm = TRUE)
 # 3. 偏差を二乗する
+(df_animal$body_length_cm[1] - mean(df_animal$body_length_cm, na.rm = TRUE))^2
 # 4. すべての値に対して1から3を繰り返し、偏差の二乗を合計する
+sum(c(df_animal$body_length_cm - mean(df_animal$body_length_cm, na.rm = TRUE))^2, na.rm = TRUE)
 # 5. 合計した値をデータの数で割る
-c(0, 0, 0, 0)
-c(1, 2, 3, 2, 1)
-c(1, 100, 5, 8, 1)
-c(1, 6, 40, 56, 1)
-df_animal$body_length_cm
-df_animal$weight_kg
+sum(c(df_animal$body_length_cm - mean(df_animal$body_length_cm, na.rm = TRUE))^2, na.rm = TRUE) / (length(na.omit(df_animal$body_length_cm)) - 1)
+
+var(df_animal$body_length_cm, na.rm = TRUE)
+var(df_animal$weight_kg, na.rm = TRUE)
+
+var(c(0, 0, 0, 0))
+var(c(1, 2, 3, 2, 1))
+var(c(1, 100, 5, 8, 1))
+var(c(1, 6, 40, 56, 1))
 
 
 # 標準偏差 --------------------------------------------------------------------
