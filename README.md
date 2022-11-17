@@ -30,6 +30,11 @@
 
 ### 第二週: データを扱うためのリテラシー
 
+<p align="center">
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/slide/week2.pdf">スライド</a> |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/week2.R">Rスクリプト</a>
+</p>
+
 - データの種類と表現方法
     - 尺度水準
     - 欠損値と外れ値、誤差
@@ -47,8 +52,6 @@
     - クロス集計
 - データ可視化
     - アンスコムの例
-    - 散布図
-    - 棒グラフ
 
 ### 第三週: データサイエンス入門(1)
 
