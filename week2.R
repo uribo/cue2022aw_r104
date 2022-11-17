@@ -252,6 +252,37 @@ psych::describe(df_animal)
 
 
 # 共分散 ---------------------------------------------------------------------
+d <- 
+  df_animal |> 
+  filter(!is.na(body_length_cm), !is.na(weight_kg)) |> 
+  select(body_length_cm, weight_kg)
+
+d |> 
+  mutate(across(everything(),.fns = mean, .names = "{.col}_mean")) |> 
+  rowwise() |> 
+  mutate(body_length_cm_deviation = body_length_cm - body_length_cm_mean,
+         weight_kg_deviation = weight_kg - weight_kg_mean) |> 
+  mutate(deviation_cross = body_length_cm_deviation * weight_kg_deviation) |> 
+  ungroup() |> 
+  pull(deviation_cross) |> 
+  sum() / (nrow(d) - 1)
+# Rの標準関数で共分散を求めるとデータの数 - 1で割る不偏共分散になります
+cov(df_animal$body_length_cm,
+    df_animal$weight_kg,
+    use = "complete.obs")
+
+# 共分散の性質... 変数の単位に依存して値が変わる
+cov(
+  # cm を m に
+  set_units(set_units(df_animal$body_length_cm, cm), m),
+  df_animal$weight_kg,
+  use = "complete.obs")
+cov(
+  # cm を m に
+  set_units(set_units(df_animal$body_length_cm, cm), m),
+  # kg を g に
+  set_units(set_units(df_animal$weight_kg, kg), g),
+    use = "complete.obs")
 
 # 相関係数 --------------------------------------------------------------------
 # 2つの変数の関係を散布図で表す
