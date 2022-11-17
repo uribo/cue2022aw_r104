@@ -139,11 +139,11 @@ sum(x) / length(x)
 mean(x)
 # 中央値
 sort(x)[ceiling(length(x)/2)]
+# median()関数で数値ベクトルの中央値を計算できます
 median(x)
 # 要素の数が偶数のときの中央値
 x <- sort(c(1, 2, 4, 6))
 (x[length(x)/2] + rev(x)[length(x)/2]) / 2
-# median()関数で数値ベクトルの中央値を計算できます
 median(x)
 # 最頻値
 x <- c(1, 3, 3, 5, 5, 5, 7, 10)
@@ -159,8 +159,8 @@ quantile(df_animal$weight_kg, na.rm = TRUE)
 # 答え合わせは講座の中で
 # 1. 変数の平均値を求める
 # 2. 変数の各値と平均値の差（偏差）を求める
-# 3. 偏差を2乗する
-# 4. すべての値に対して1から3を繰り返し、偏差の2乗を合計する
+# 3. 偏差を二乗する
+# 4. すべての値に対して1から3を繰り返し、偏差の二乗を合計する
 # 5. 合計した値をデータの数で割る
 c(0, 0, 0, 0)
 c(1, 2, 3, 2, 1)
@@ -169,6 +169,81 @@ c(1, 6, 40, 56, 1)
 df_animal$body_length_cm
 df_animal$weight_kg
 
+
+# 標準偏差 --------------------------------------------------------------------
+units::set_units(df_animal$body_length_cm, cm)^2
+sqrt(var(df_animal$body_length_cm, na.rm = TRUE))
+# Rの標準偏差を求める関数sd()は不偏標準偏差として扱います
+sd(df_animal$body_length_cm, na.rm = TRUE)
+
+
+# 度数分布表 -------------------------------------------------------------------
+# 動物データの分類群ごとの頻度を数える
+table(df_animal$taxon)
+# 度数分布表の形にする
+df_animal |> 
+  count(taxon, name = "frequency")
+
+body_length_freq <- 
+  # 動物データの体長を40cm間隔の階級に分けて頻度を数える
+  table(cut(df_animal$body_length_cm, 
+            breaks = seq(20, 
+                         200, 
+                         # 各度数に含まれる区間の幅を階級幅という
+                         # 階級幅や階級数はデータの範囲を見て決める
+                         by = 40)))
+tibble(
+  class = names(body_length_freq),
+  frequency = body_length_freq)
+
+
+# ヒストグラム ------------------------------------------------------------------
+df_animal |> 
+  ggplot(aes(body_length_cm)) +
+  # ヒストグラムでは柱の階級をビン bin と呼びます
+  geom_histogram(bins = 4) +
+  ylab("Frequency") +
+  xlab("Body length (cm)") +
+  labs(title = "動物の体長のヒストグラム")
+# ggsave(here("images/animal_body_length_histogram.png"),
+#        width = 5,
+#        height = 4)
+
+# ヒストグラムの階級数を変えると形も変わります
+p1 <- 
+  df_animal |> 
+  ggplot(aes(body_length_cm)) +
+  geom_histogram(bins = 2, fill = course_colors[1]) +
+  ylab("Frequency") +
+  xlab("Body length (cm)") +
+  labs(title = "動物の体長のヒストグラム",
+       subtitle = "階級数2")
+p2 <- 
+  df_animal |> 
+  ggplot(aes(body_length_cm)) +
+  geom_histogram(bins = 10, fill = course_colors[2]) +
+  ylab("Frequency") +
+  xlab("Body length (cm)") +
+  labs(title = "動物の体長のヒストグラム",
+       subtitle = "階級数10")
+p1 + p2 +
+  plot_layout(ncol = 2)
+# ggsave(here("images/animal_body_length_histogram2.png"),
+#        width = 7,
+#        height = 4)
+
+# 箱ひげ図 --------------------------------------------------------------------
+quantile(df_ssdse_b2019$`総人口`)
+
+# 東京都の人口は外れ値？
+# 箱ひげ図での確認
+df_ssdse_b2019 |> 
+  ggplot() +
+  aes(y = `総人口`) +
+  geom_boxplot()
+# 箱ひげ図の発展系... 
+# library(ggbeeswarm)
+# library(ggdist)
 
 # データの要約 ------------------------------------------------------------------
 summary(df_animal)
@@ -334,21 +409,6 @@ datasaurus_dozen |>
       mutate(cor = round(cor, digits = 2)),
     by = "dataset")
 
-
-# ヒストグラム ------------------------------------------------------------------
-
-# 箱ひげ図 --------------------------------------------------------------------
-quantile(df_ssdse_b2019$`総人口`)
-
-# 東京都の人口は外れ値？
-# 箱ひげ図での確認
-df_ssdse_b2019 |> 
-  ggplot() +
-  aes(y = `総人口`) +
-  geom_boxplot()
-# 箱ひげ図の発展系... 
-# library(ggbeeswarm)
-# library(ggdist)
 
 # 棒グラフ --------------------------------------------------------------------
 # 縦にする、軸にだまされない
