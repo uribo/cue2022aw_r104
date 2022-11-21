@@ -153,18 +153,23 @@ cor(df_ice_weather$ice, df_ice_weather$temperature_average_c)^2
 # 標準化 ---------------------------------------------------------------------
 mean(df_animal$body_length_cm, na.rm = TRUE)
 sd(df_animal$body_length_cm, na.rm = TRUE)
+mean(df_animal$weight_kg, na.rm = TRUE)
 sd(df_animal$weight_kg, na.rm = TRUE)
-
-df_animal
 
 x <- 
   scale(df_animal$body_length_cm)
 round(mean(x, na.rm = TRUE)) # 平均 0
 sd(x, na.rm = TRUE) # 標準偏差 1
 
+df_animal_scaled <- 
+  df_animal |> 
+  mutate(across(.cols = c(body_length_cm, weight_kg), .fns = ~ c(scale(.x))))
+
+df_animal_scaled |> 
+  summarise(across(.cols = c(body_length_cm, weight_kg), .fns = list(mean = ~ round(mean(.x, na.rm = TRUE), digits = 0),
+                                                                     sd = ~ sd(.x, na.rm = TRUE))))
 
 # 重回帰モデル ---------------------------------------------------------------------
-
 lm_res <- 
   lm(ice ~ precipitation_sum_mm + temperature_average_c, data = df_ice_weather)
 tidy(lm_res) # 降水量よりも気温の効果が大きい
@@ -195,6 +200,9 @@ df_ice_weather_scaled |>
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   theme(legend.position = "top")
+
+
+# 多重共線性 -------------------------------------------------------------------
 
 
 
