@@ -6,6 +6,7 @@ library(patchwork)
 library(here)
 library(broom)
 library(ggpmisc)
+library(tidymodels)
 course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 theme_set(theme_bw())
 
@@ -200,10 +201,57 @@ df_ice_weather_scaled |>
   aes(value, ice, color = name) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = course_colors[1:2]) +
   theme(legend.position = "top")
 
 
 # 多重共線性 -------------------------------------------------------------------
+# car::vif(lm_res)
 
 
+# ロジスティック回帰 ---------------------------------------------------------------
+# lr ... logistic regression
+lr_spec <- 
+  logistic_reg(mode = "classification",
+                      engine = "glm")
+data("credit_data", package = "modeldata")
+lr_spec |> 
+  fit(Status ~ Seniority + Age, data = credit_data) |> 
+  tidy()
 
+data("two_class_dat", package = "modeldata")
+lr_fitted <- 
+  lr_spec |> 
+  fit(Class ~ A + B, data = two_class_dat)
+
+lr_fitted |> 
+  tidy()
+
+predict(lr_fitted, new_data = two_class_dat)
+two_class_dat |> 
+  ggplot() +
+  aes(A, B) + 
+  geom_point(aes(color = Class)) +
+  scale_color_manual(values = course_colors[1:2]) +
+  theme(legend.position = "top")
+
+augment(lr_fitted, new_data = two_class_dat) |> 
+  roc_auc(Class, .pred_Class1)
+augment(lr_fitted, new_data = two_class_dat) |> 
+  metrics(Class, .pred_class)
+  
+
+# サポートベクトルマシン -------------------------------------------------------------
+library(LiblineaR)
+svm_spec <- 
+  svm_linear(mode = "classification",
+                    engine = "LiblineaR")
+
+svm_fitted <- 
+  svm_spec |> 
+  fit(Class ~ A + B, data = two_class_dat)
+
+tidy(svm_fitted)
+
+augment(svm_fitted, new_data = two_class_dat) |> 
+  metrics(Class, .pred_class)
