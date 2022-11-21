@@ -55,19 +55,6 @@ deviance(lm_res)
 # 回帰診断図
 # plot(lm_res)
 
-# 予測値
-d <- 
-  df_ice_weather |> 
-  bind_cols(tibble(
-    .pred = predict(lm_res),
-    residual = residuals(lm_res)))
-# plot(d$temperature_average_c, d$ice)
-# abline(lm_res)
-# d |> 
-#   ggplot() +
-#   aes(temperature_average_c, ice) +
-#   geom_point() +
-#   geom_point(aes(temperature_average_c, .pred - residual), color = course_colors[2])
 
 # 回帰直線
 df_ice_weather |> 
@@ -88,18 +75,50 @@ df_ice_weather |>
 #        height = 4)
 
 # 回帰直線の係数から目的変数の値（yハット)を推定
+coefficients(lm_res)[[1]] + coefficients(lm_res)[[2]] * df_ice_weather$temperature_average_c[1]
 y_hat <- coefficients(lm_res)[[1]] + coefficients(lm_res)[[2]] * df_ice_weather$temperature_average_c
+df_ice_weather$ice[1]　- y_hat[1]
 # 残差 (実際に得られた目的変数の値とyハットとの差)
 df_ice_weather$ice - y_hat
 # lm()関数の結果にresiduals(残差)として記録
 unname(lm_res$residuals)
 
-
 # 最小二乗法 -------------------------------------------------------------------
 # 実際の目的変数の値は、説明変数の値に対してさまざまな値を取り得る
-# ... 残差の最も少ない回帰式を求める
-# 最小二乗法により、残差平方和が傾きと切片が最小となる定数項を求める
+# ... 残差平方和の最も少ない回帰式を求める
+# 最小二乗法により、残差平方和が最小となる定数項（傾きと切片）を求める
 # 最も当てはまりのよい直線
+# いくつかの回帰直線を考える
+library(infer)
+set.seed(20221124)
+df_resample_fit <-
+  x <-
+  df_ice_weather |>
+  specify(ice ~ temperature_average_c) |>
+  hypothesise(null = "independence") |>
+  generate(reps = 5, type = "permute") |>
+  fit()
+
+
+# 残差
+all.equal(
+  unname(lm_res$residuals),
+  df_ice_weather$ice - (coefficients(lm_res)[[1]] + coefficients(lm_res)[[2]] * df_ice_weather$temperature_average_c)
+)
+# 残差平方和
+all.equal(
+  deviance(lm_res),
+  sum((df_ice_weather$ice - (coefficients(lm_res)[[1]] + coefficients(lm_res)[[2]] * df_ice_weather$temperature_average_c))^2)  
+)
+# 残差平方和が最小となる係数を回帰直線の係数とする
+which.min(
+  c(deviance(lm_res),
+    sum((df_ice_weather$ice - (df_resample_fit$estimate[3] + df_resample_fit$estimate[4] * df_ice_weather$temperature_average_c))^2),
+    sum((df_ice_weather$ice - (df_resample_fit$estimate[5] + df_resample_fit$estimate[6] * df_ice_weather$temperature_average_c))^2),
+    sum((df_ice_weather$ice - (df_resample_fit$estimate[7] + df_resample_fit$estimate[8] * df_ice_weather$temperature_average_c))^2)
+  )
+)
+
 # 正規方程式を解くことにより求まる
 value_b <- 
   df_ice_weather %>% 
@@ -115,10 +134,20 @@ value_a <-
 glue::glue("傾き = {value_b}")
 glue::glue("切片 = {value_a}")
 
+mean(lm_res$residuals^2) # 平均二乗残差
 
-# 決定係数 --------------------------------------------------------------------
+
+# 決定係数 R^2 --------------------------------------------------------------------
 # 1に近いほど、回帰式が実際のデータに当てはまっていることを表す
+# 1 - 残差平方和 / 全平方和
 1 - (deviance(lm_res) / sum((df_ice_weather$ice - mean(df_ice_weather$ice))^2))
+summary(lm_res)$r.squared
+cor(df_ice_weather$ice, df_ice_weather$temperature_average_c)^2
+
+1 - (sum((df_ice_weather$ice - (df_resample_fit$estimate[3] + df_resample_fit$estimate[4] * df_ice_weather$temperature_average_c))^2) / sum((df_ice_weather$ice - mean(df_ice_weather$ice))^2))
+1 - (sum((df_ice_weather$ice - (df_resample_fit$estimate[5] + df_resample_fit$estimate[6] * df_ice_weather$temperature_average_c))^2) / sum((df_ice_weather$ice - mean(df_ice_weather$ice))^2))
+
+
 
 
 # 標準化 ---------------------------------------------------------------------
