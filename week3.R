@@ -209,7 +209,7 @@ df_ice_weather_scaled |>
 # car::vif(lm_res)
 
 
-# ロジスティック回帰 ---------------------------------------------------------------
+# ロジスティック回帰（線形分類） ---------------------------------------------------------------
 # lr ... logistic regression
 lr_spec <- 
   logistic_reg(mode = "classification",
@@ -237,11 +237,26 @@ two_class_dat |>
 
 augment(lr_fitted, new_data = two_class_dat) |> 
   roc_auc(Class, .pred_Class1)
+# 正確度、kappa
 augment(lr_fitted, new_data = two_class_dat) |> 
   metrics(Class, .pred_class)
-  
+# 適合度
+augment(lr_fitted, new_data = two_class_dat) |> 
+  precision(Class, .pred_class)
+augment(lr_fitted, new_data = two_class_dat) |> 
+  recall(Class, .pred_class)
 
-# サポートベクトルマシン -------------------------------------------------------------
+multi_metric <- 
+  metric_set(accuracy, precision, recall)
+augment(lr_fitted, new_data = two_class_dat) |> 
+  multi_metric(truth = Class, estimate = .pred_class)
+
+# 混同行列
+augment(lr_fitted, new_data = two_class_dat) |> 
+  conf_mat(truth = Class, estimate = .pred_class) |> 
+  autoplot(type = "heatmap")
+
+# サポートベクトルマシン（非線形分類） -------------------------------------------------------------
 library(LiblineaR)
 svm_spec <- 
   svm_linear(mode = "classification",
