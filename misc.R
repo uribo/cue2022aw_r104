@@ -86,3 +86,84 @@ ggsave(filename = here::here("images/2つの変数の関係を示す3つの状�
        last_plot(),
        width = 7,
        height = 2.6)
+
+
+# week3 -------------------------------------------------------------------
+df_ice_weather <-
+  pins_resources_local |> 
+  pins::pin_read("tksm_sales_weather") |> 
+  select(!c(pesticide, rice))
+library(infer)
+set.seed(20221124)
+df_resample_fit <-
+  x <-
+  df_ice_weather |>
+  specify(ice ~ temperature_average_c) |>
+  hypothesise(null = "independence") |>
+  generate(reps = 5, type = "permute") |>
+  fit()
+lm_res <-
+  lm(ice ~ temperature_average_c, data = df_ice_weather)
+p <-
+  df_ice_weather |>
+  ggplot() +
+  aes(temperature_average_c, ice) +
+  geom_point()
+p +
+  geom_abline(intercept = df_resample_fit$estimate[3],
+              slope = df_resample_fit$estimate[4],
+              color = course_colors[2]) +
+  geom_abline(intercept = df_resample_fit$estimate[5],
+              slope = df_resample_fit$estimate[6],
+              color = course_colors[3]) +
+  geom_abline(intercept = df_resample_fit$estimate[7],
+              slope = df_resample_fit$estimate[8],
+              color = course_colors[4]) +
+  geom_line(stat = "smooth",
+            method = lm,
+            color = course_colors[1],
+            linewidth = 1,
+            alpha = 0.5,
+            linetype = 2) +
+  geom_smooth(method = "lm",
+              se = FALSE,
+              color = NA)
+ggsave(here("images/さまざまな回帰直線.png"),
+       width = 5,
+       height = 4)
+
+
+
+df_ice_weather$ice[1]
+
+sum(df_ice_weather$ice - (df_resample_fit$estimate[3] + df_resample_fit$estimate[4] * df_ice_weather$temperature_average_c)^2)
+sum(df_ice_weather$ice - (df_resample_fit$estimate[5] + df_resample_fit$estimate[6] * df_ice_weather$temperature_average_c)^2)
+sum(df_ice_weather$ice - (df_resample_fit$estimate[7] + df_resample_fit$estimate[8] * df_ice_weather$temperature_average_c)^2)
+
+library(ggpmisc)
+
+df_ice_weather |>
+  ggplot() +
+  aes(temperature_average_c, ice) +
+  geom_point(color = "gray", alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE, color = course_colors[1]) +
+  geom_point(data = NULL,
+             aes(x = temperature_average_c[6],
+                 y = ice[6]),
+             color = course_colors[2]) +
+  geom_text(aes(x = 10,
+                y = 600),
+            label = round(lm_res$residuals[[6]], digits = 2),
+            fontface = "plain") +
+  geom_linerange(aes(x = temperature_average_c[6],
+                ymin = ice[6] - lm_res$residuals[[6]],
+                ymax = ice[6]))
+
+df_ice_weather$ice[6] - lm_res$residuals[[6]]
+
+p +
+  stat_fit_deviations(colour = course_colors[2]) +
+  stat_poly_line(method = "lm", se = FALSE, color = course_colors[1])
+
+
+
