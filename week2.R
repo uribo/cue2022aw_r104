@@ -15,7 +15,7 @@ course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 source(here("_pins.R"))
 # 動物データ
 df_animal <-
-  pins_resources |> 
+  pins_resources_online |> 
   pins::pin_download("tokushima_zoo_animals22") |> 
   read_csv(col_types = "ccdd") |> 
   # 体重が200kg以上の場合にTRUE
@@ -51,6 +51,7 @@ df_icecream_temperature <-
          `品目分類` == "アイスクリーム・シャーベット",
          `項目` == "購入頻度_100世帯当たり") |> 
   select(ym, `項目`, value) |> 
+  mutate(ym = as.character(ym)) |> 
   left_join(
     df_shikoku_weather2019to2021 |> 
       filter(station_name == "徳島") |> 
@@ -72,6 +73,7 @@ df_pesticide_ice <-
              `品目分類` == "アイスクリーム・シャーベット") |> 
       select(ym, ice = value),
     by = "ym") |> 
+  mutate(ym = as.character(ym)) |> 
   left_join(
     df_shikoku_weather2019to2021 |> 
       filter(station_name == "徳島") |> 

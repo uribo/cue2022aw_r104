@@ -4,7 +4,7 @@
 # renv::settings$ignored.packages(unique(c(renv::settings$ignored.packages(), "jmastats", "sf")))
 
 pins_resources_local <- 
-  pins::board_folder(here("data-raw"))
+  pins::board_folder(here::here("data-raw"))
 
 if (pins_resources_local |> 
     pins::pin_list() |> 
