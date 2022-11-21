@@ -98,7 +98,6 @@ df_ice_weather <-
 library(infer)
 set.seed(20221124)
 df_resample_fit <-
-  x <-
   df_ice_weather |>
   specify(ice ~ temperature_average_c) |>
   hypothesise(null = "independence") |>

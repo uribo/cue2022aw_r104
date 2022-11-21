@@ -174,8 +174,9 @@ lm_res <-
   lm(ice ~ precipitation_sum_mm + temperature_average_c, data = df_ice_weather)
 tidy(lm_res) # 降水量よりも気温の効果が大きい
 
+# 標準化したデータを使う
 df_ice_weather_scaled <- 
-  df_pesticide_ice |> 
+  df_ice_weather |> 
   mutate(across(.cols = c(precipitation_sum_mm, temperature_average_c), .fns = ~ c(scale(.x))))
 lm_res_scaled <- 
   lm(ice ~ precipitation_sum_mm + temperature_average_c, data = df_ice_weather_scaled)
