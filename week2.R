@@ -12,20 +12,29 @@ course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 
 
 # データの準備 ------------------------------------------------------------------
+source(here("_pins.R"))
 # 動物データ
 df_animal <-
-  read_csv("https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv",
-                  col_types = "ccdd") |> 
+  pins_resources |> 
+  pins::pin_download("tokushima_zoo_animals22") |> 
+  read_csv(col_types = "ccdd") |> 
   # 体重が200kg以上の場合にTRUE
   mutate(heavy_mt_200kg = weight_kg > 200)
+
 df_shikoku_kome_sisyutu2019to2021 <-
-  read_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県.csv"),
-           col_types = "cccccd")
+  pins_resources_local |> 
+  pins::pin_read("shikoku_kome_sisyutu2019to2021") |> 
+  as_tibble()
+
 df_shikoku_weather2019to2021 <-
-  read_csv(here("data-raw/shikoku_weather2019to2021.csv"),
-           col_types = "iiccdd")
+  pins_resources_local |> 
+  pins::pin_read("shikoku_weather2019to2021") |> 
+  as_tibble()
+
 df_ssdse_b_raw <- 
-  read_ssdse_b(here("data-raw/SSDSE-B-2022.csv"), lang = "ja")
+  pins_resources_online |> 
+  pins::pin_download("ssdse_b") |> 
+  read_ssdse_b(lang = "ja")
 df_ssdse_b <- 
   df_ssdse_b_raw |> 
   # マルチバイト文字列（日本語など）の変数名を指定する際は アクセント ` で囲むようにします 

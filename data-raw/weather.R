@@ -3,7 +3,13 @@
 # renv::install("uribo/jmastats")
 # renv::settings$ignored.packages(unique(c(renv::settings$ignored.packages(), "jmastats", "sf")))
 
-if (file.exists(here("data-raw/shikoku_weather2019to2021.csv")) == FALSE) {
+pins_resources_local <- 
+  pins::board_folder(here("data-raw"))
+
+if (pins_resources_local |> 
+    pins::pin_list() |> 
+    stringr::str_detect("shikoku_weather2019to2021") |> 
+    sum() != 1) {
   library(jmastats)
   library(dplyr)
   library(here)
@@ -44,7 +50,10 @@ if (file.exists(here("data-raw/shikoku_weather2019to2021.csv")) == FALSE) {
       by = "block_no"
     ) |> 
     relocate(station_name, .after = 3)
-  
-  df_shikoku_weather2019to2021 |> 
-    readr::write_csv(here("data-raw/shikoku_weather2019to2021.csv"))
+
+  pins_resources_local |> 
+    pins::pin_write(
+      df_shikoku_weather2019to2021,
+    name = "shikoku_weather2019to2021",
+    type = "csv")
 }

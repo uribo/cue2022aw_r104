@@ -1,0 +1,8 @@
+file: shikoku_kome_sisyutu2019to2021.csv
+file_size: 75893
+pin_hash: f75ffb296c157b33
+type: csv
+title: 'shikoku_kome_sisyutu2019to2021: a pinned 864 x 6 data frame'
+description: 家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県
+created: 20221121T014749Z
+api_version: 1.0

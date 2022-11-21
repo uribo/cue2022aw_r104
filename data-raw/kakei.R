@@ -13,7 +13,14 @@ library(estatapi)
 library(here)
 renv::settings$ignored.packages(unique(c(renv::settings$ignored.packages(), c("estatapi", "httr2"))))
 fs::dir_create(here("data-raw/家計調査"))
-if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4件_品目_米.csv")) == FALSE) {
+
+pins_resources_local <- 
+  pins::board_folder(here("data-raw"))
+
+if (pins_resources_local |> 
+    pins::pin_list() |> 
+    stringr::str_detect("shikoku_kome_sisyutu2019to2021") |> 
+    sum() != 1) {
   if (length(fs::dir_ls(here("data-raw/家計調査"), regexp = ".(xls|xlsx)$")) != 36L) {
     
     if (Sys.getenv("ESTAT_TOKEN") == "") {
@@ -279,8 +286,12 @@ if (file.exists(here("data-raw/家計調査_1世帯当たり1か月間の支出�
       bind_rows(df_shikoku_kome_sisyutu2) |> 
       arrange(ym, `市区町村コード`, `品目分類`, `項目`)
     
-    df_shikoku_kome_sisyutu2019to2021 |> 
-      readr::write_csv(here("data-raw/家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県.csv"))
+    pins_resources_local |> 
+      pins::pin_write(
+        df_shikoku_kome_sisyutu2019to2021,
+        name = "shikoku_kome_sisyutu2019to2021",
+        description = "家計調査_1世帯当たり1か月間の支出金額_購入数量及び平均価格_四国4県",
+        type = "csv")
 }
 
 
