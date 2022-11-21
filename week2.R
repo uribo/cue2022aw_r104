@@ -45,42 +45,13 @@ df_ssdse_b2019 <-
   filter(`年度` == 2019)
 # glimpse(df_ssdse_b2019)
 
-df_icecream_temperature <- 
-  df_shikoku_kome_sisyutu2019to2021 |> 
-  filter(`市` == "徳島市",
-         `品目分類` == "アイスクリーム・シャーベット",
-         `項目` == "購入頻度_100世帯当たり") |> 
-  select(ym, `項目`, value) |> 
-  mutate(ym = as.character(ym)) |> 
-  left_join(
-    df_shikoku_weather2019to2021 |> 
-      filter(station_name == "徳島") |> 
-      transmute(ym = str_c(year,
-                           str_pad(month, width = 2, pad = "0")),
-                temperature_average_c),
-    by = "ym")
-
 df_pesticide_ice <- 
-  df_shikoku_kome_sisyutu2019to2021 |> 
-  filter(`市` == "徳島市",
-         `項目` == "購入頻度_100世帯当たり",
-         `品目分類` == "殺虫・防虫剤") |> 
-  select(ym, pesticide = value) |> 
-  left_join(
-    df_shikoku_kome_sisyutu2019to2021 |> 
-      filter(`市` == "徳島市",
-             `項目` == "購入頻度_100世帯当たり",
-             `品目分類` == "アイスクリーム・シャーベット") |> 
-      select(ym, ice = value),
-    by = "ym") |> 
-  mutate(ym = as.character(ym)) |> 
-  left_join(
-    df_shikoku_weather2019to2021 |> 
-      filter(station_name == "徳島") |> 
-      transmute(ym = str_c(year,
-                           str_pad(month, width = 2, pad = "0")),
-                temperature_average_c),
-    by = "ym")
+  pins_resources_local |> 
+  pins::pin_read("tksm_sales_weather")
+
+df_icecream_temperature <- 
+  df_pesticide_ice |> 
+  select(ym, value = ice, temperature_average_c)
 
 anscombe_long <- 
   anscombe |> 
@@ -468,5 +439,3 @@ datasaurus_dozen |>
 # 縦にする、軸にだまされない
 
 # 散布図 ---------------------------------------------------------------------
-
-

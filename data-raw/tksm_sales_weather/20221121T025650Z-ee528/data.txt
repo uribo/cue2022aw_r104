@@ -1,0 +1,8 @@
+file: tksm_sales_weather.rds
+file_size: 722
+pin_hash: ee528ec77312c350
+type: rds
+title: 'tksm_sales_weather: a pinned 36 x 6 data frame'
+description: ~
+created: 20221121T025650Z
+api_version: 1.0
