@@ -22,6 +22,15 @@ df_ice_weather <-
   pins::pin_read("tksm_sales_weather") |> 
   select(!c(pesticide, rice))
 
+df_ssdse_b <- 
+  pins_resources_online |> 
+  pins::pin_download("ssdse_b") |> 
+  read_ssdse_b(lang = "ja") |> 
+  filter(`年度` == 2019) |> 
+  select(`都道府県`, `教育`, `家計`) |> 
+  tidyr::unnest(cols = c(`教育`, `家計`)) |>
+  select(ends_with("教員数"), `教育費（二人以上の世帯）`)
+
 # 単回帰モデル ------------------------------------------------------------------
 # y = a + bx + e
 # a ... 切片
@@ -207,7 +216,25 @@ df_ice_weather_scaled |>
 
 # 多重共線性 -------------------------------------------------------------------
 # car::vif(lm_res)
+df_ssdse_b <- 
+  df_ssdse_b |> 
+  purrr::set_names(c("a", "b", "c", "d", "e", "f", "y"))
 
+lm_res <- 
+  lm(y ~ ., data = df_ssdse_b)
+tidy(lm_res)
+car::vif(lm_res)
+# stats::step(lm_res)
+
+corrr::correlate(df_ssdse_b, diagonal = 1.0)
+
+lm_res <- 
+  lm(y ~ a + e + f, data = df_ssdse_b)
+tidy(lm_res)
+
+ms1 <- 
+  MuMIn::dredge(lm_res)
+MuMIn::sw(ms1)
 
 # ロジスティック回帰（線形分類） ---------------------------------------------------------------
 # lr ... logistic regression
