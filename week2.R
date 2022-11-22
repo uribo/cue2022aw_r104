@@ -1,15 +1,15 @@
 ################################
 # 第二週: データを扱うためのリテラシー
 ################################
-library(tidyverse)
-library(here)
-library(patchwork)
+library(tidyverse) # データ分析全般
+library(here) # フォルダ、ファイルの指定を簡易に
+library(patchwork) # ggplot2で作成した図のレイアウトを調整
 library(ssdse)
 library(units)
 library(ggrepel)
 library(visdat)
 course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
-
+theme_set(theme_bw()) # ggplot2のテーマを指定
 
 # データの準備 ------------------------------------------------------------------
 source(here("_pins.R"))
@@ -31,17 +31,13 @@ df_shikoku_weather2019to2021 <-
   pins::pin_read("shikoku_weather2019to2021") |> 
   as_tibble()
 
-df_ssdse_b_raw <- 
+df_ssdse_b2019 <- 
   pins_resources_online |> 
   pins::pin_download("ssdse_b") |> 
-  read_ssdse_b(lang = "ja")
-df_ssdse_b <- 
-  df_ssdse_b_raw |> 
+  read_ssdse_b(lang = "ja") |> 
   # マルチバイト文字列（日本語など）の変数名を指定する際は アクセント ` で囲むようにします 
   select(`年度`, `都道府県`, `人口・世帯`, `家計`) |> 
-  unnest(cols = c(`人口・世帯`, `家計`))
-df_ssdse_b2019 <- 
-  df_ssdse_b |> 
+  unnest(cols = c(`人口・世帯`, `家計`)) |> 
   filter(`年度` == 2019)
 # glimpse(df_ssdse_b2019)
 
@@ -436,6 +432,69 @@ datasaurus_dozen |>
 
 
 # 棒グラフ --------------------------------------------------------------------
-# 縦にする、軸にだまされない
+# 軸にだまされない
+# 都道府県ごとの総人口
+p <- 
+  df_ssdse_b2019 |> 
+  ggplot() +
+  # x軸とy軸に描画したい変数名を指定します
+  aes(x = `都道府県`, y = `総人口`) +
+  # 棒グラフの指定
+  geom_bar(
+    # stat = "identity" ... 変数の値を直接棒の高さとする指定
+    stat = "identity")
+
+# ggplot2では +演算子により、グラフに必要な要素（レイヤー）を
+# 追加していくことで目的の図を作成します
+p <- 
+  p +
+  labs(title = "都道府県別総人口")
+
+p
+
+# デフォルトで作成される図を改善してみましょう
+# 1. x軸（都道府県）の並びを変更する
+# デフォルトでは文字の並び順が順番に適用される
+# forcats::fct_reorder()を使うことで任意の数値の順番で入れ替えが可能になります
+levels(as.factor(df_ssdse_b2019$`都道府県`))
+# 都道府県の並びを総人口の並びに変更する
+levels(fct_reorder(df_ssdse_b2019$`都道府県`, df_ssdse_b2019$`総人口`))
+p <- 
+  df_ssdse_b2019 |> 
+  ggplot() +
+  aes(x = fct_reorder(`都道府県`, `総人口`), y = `総人口`) +
+  # 棒グラフの指定
+  geom_bar(
+    # stat = "identity" ... 変数の値を直接棒の高さとする指定
+    stat = "identity")
+# 都道府県名の表示が横並びになるため、文字の間隔がせまい
+p
+
+# x軸を配置することで都道府県名を判読可能にする
+p +
+  coord_flip()
 
 # 散布図 ---------------------------------------------------------------------
+df_pesticide_ice |> 
+  ggplot() +
+  aes(temperature_average_c, ice) +
+  geom_point()
+
+# 折れ線グラフ ------------------------------------------------------------------
+df_pesticide_ice |> 
+  pivot_longer(cols = c(pesticide, ice, rice)) |> 
+  mutate(ym = lubridate::ym(ym),
+         name = case_when(
+           name == "pesticide" ~ "殺虫・防虫剤",
+           name == "ice" ~ "アイスクリーム・シャーベット",
+           name == "rice" ~ "米",
+         )) |> 
+  ggplot() +
+  aes(ym, value, group = name, color = name) |> 
+  geom_line() +
+  scale_color_manual(values = course_colors[1:3]) +
+  scale_x_date(labels = scales::label_date("%Y年%b", locale = "ja"),
+               date_breaks = "6 month") +
+  facet_wrap(~ name, ncol = 1, scales = "free_y") +
+  guides(color = "none")
+
