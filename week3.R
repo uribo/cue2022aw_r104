@@ -253,7 +253,7 @@ test_two_class <-
   testing(two_class_split)
 
 
-# ロジスティック回帰（線形分類） ---------------------------------------------------------------
+# ロジスティック回帰 ---------------------------------------------------------------
 glm(Class ~ A + B, data = train_two_class, family = binomial) |> 
   broom::tidy()
 
@@ -320,7 +320,7 @@ augment(lr_fitted, new_data = test_two_class) |>
 augment(lr_fitted, new_data = test_two_class) |> 
   recall(Class, .pred_class)
 
-# サポートベクトルマシン（非線形分類） -------------------------------------------------------------
+# サポートベクトルマシン -------------------------------------------------------------
 library(LiblineaR)
 svm_spec <- 
   svm_linear(mode = "classification",
