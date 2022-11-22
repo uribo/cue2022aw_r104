@@ -80,17 +80,6 @@
         "Matrix"
       ]
     },
-    "MuMIn": {
-      "Package": "MuMIn",
-      "Version": "1.47.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "6dd79c928c4776d700bf89779d4c376d",
-      "Requirements": [
-        "Matrix",
-        "nlme"
-      ]
-    },
     "R.cache": {
       "Package": "R.cache",
       "Version": "0.16.0",
