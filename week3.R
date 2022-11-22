@@ -235,67 +235,105 @@ df_ice_weather_scaled |>
 # 標準化したデータを使って重回帰モデルを行う
 lm_res_scaled <- 
   lm(ice ~ temperature_average_c + precipitation_sum_mm, data = df_ice_weather_scaled)
+# 標準化によりすべての係数が同じ物差しとして評価できる（標準偏回帰係数）
 tidy(lm_res_scaled)
 
 
+# データ分割 -------------------------------------------------------------------
+# モデルの学習・評価のためにデータを分割する
+data("two_class_dat", package = "modeldata")
+two_class_split <- 
+  initial_split(two_class_dat, strata = "Class")
+two_class_split
+# 学習データ
+train_two_class <-
+  training(two_class_split)
+# 評価データ
+test_two_class <-
+  testing(two_class_split)
+
+
 # ロジスティック回帰（線形分類） ---------------------------------------------------------------
+glm(Class ~ A + B, data = train_two_class, family = binomial) |> 
+  broom::tidy()
+
 # lr ... logistic regression
 lr_spec <- 
   logistic_reg(mode = "classification",
-                      engine = "glm")
-data("credit_data", package = "modeldata")
-lr_spec |> 
-  fit(Status ~ Seniority + Age, data = credit_data) |> 
-  tidy()
-
-data("two_class_dat", package = "modeldata")
+               engine = "glm")
 lr_fitted <- 
   lr_spec |> 
-  fit(Class ~ A + B, data = two_class_dat)
+  fit(Class ~ A + B, data = train_two_class)
 
 lr_fitted |> 
   tidy()
 
-predict(lr_fitted, new_data = two_class_dat)
+predict(lr_fitted, new_data = test_two_class)
 two_class_dat |> 
   ggplot() +
   aes(A, B) + 
   geom_point(aes(color = Class)) +
   scale_color_manual(values = course_colors[1:2]) +
   theme(legend.position = "top")
+# ggsave(here("images/two_class_classification.png"),
+#        width = 5,
+#        height = 4)
 
-augment(lr_fitted, new_data = two_class_dat) |> 
-  roc_auc(Class, .pred_Class1)
-# 正確度、kappa
-augment(lr_fitted, new_data = two_class_dat) |> 
-  metrics(Class, .pred_class)
-# 適合度
-augment(lr_fitted, new_data = two_class_dat) |> 
-  precision(Class, .pred_class)
-augment(lr_fitted, new_data = two_class_dat) |> 
-  recall(Class, .pred_class)
+two_class_dat |> 
+  ggplot() + 
+  aes(B, as.numeric(Class) - 1) + 
+  geom_point() +
+  geom_smooth(method = "glm", 
+              se = FALSE, 
+              method.args = list(family = binomial),
+              color = course_colors[1]) +
+  ylab("Class")
+# ggsave(here("images/two_class_logistic_curve.png"),
+#        width = 5,
+#        height = 4)
+
+
+# 分類モデルの評価 ----------------------------------------------------------------
+# 混同行列
+augment(lr_fitted, new_data = test_two_class) |> 
+  conf_mat(truth = Class, estimate = .pred_class) |> 
+  autoplot(type = "heatmap")
+# ggsave(here("images/logistic_regression_confusion_matrix.png"),
+#        width = 5,
+#        height = 4)
 
 multi_metric <- 
   metric_set(accuracy, precision, recall)
-augment(lr_fitted, new_data = two_class_dat) |> 
+augment(lr_fitted, new_data = train_two_class) |> 
+  multi_metric(truth = Class, estimate = .pred_class)
+augment(lr_fitted, new_data = test_two_class) |> 
   multi_metric(truth = Class, estimate = .pred_class)
 
-# 混同行列
-augment(lr_fitted, new_data = two_class_dat) |> 
-  conf_mat(truth = Class, estimate = .pred_class) |> 
-  autoplot(type = "heatmap")
+augment(lr_fitted, new_data = test_two_class) |> 
+  roc_auc(Class, .pred_Class1)
+# 正確度、kappa
+augment(lr_fitted, new_data = test_two_class) |> 
+  metrics(Class, .pred_class)
+# 適合度
+augment(lr_fitted, new_data = test_two_class) |> 
+  precision(Class, .pred_class)
+augment(lr_fitted, new_data = test_two_class) |> 
+  recall(Class, .pred_class)
 
 # サポートベクトルマシン（非線形分類） -------------------------------------------------------------
 library(LiblineaR)
 svm_spec <- 
   svm_linear(mode = "classification",
-                    engine = "LiblineaR")
+             engine = "LiblineaR")
 
 svm_fitted <- 
   svm_spec |> 
-  fit(Class ~ A + B, data = two_class_dat)
+  fit(Class ~ A + B, data = train_two_class)
 
 tidy(svm_fitted)
 
-augment(svm_fitted, new_data = two_class_dat) |> 
+augment(svm_fitted, new_data = test_two_class) |> 
+  multi_metric(truth = Class, estimate = .pred_class)
+
+augment(svm_fitted, new_data = test_two_class) |> 
   metrics(Class, .pred_class)
