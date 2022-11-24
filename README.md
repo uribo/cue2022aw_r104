@@ -55,6 +55,11 @@
 
 ### 第三週: データサイエンス入門(1)
 
+<p align="center">
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/slide/week3.pdf">スライド</a> |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/week3.R">Rスクリプト</a>
+</p>
+
 - 単回帰モデル
     - 最小二乗法
     - 回帰係数
