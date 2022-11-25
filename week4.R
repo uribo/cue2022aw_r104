@@ -10,14 +10,45 @@ theme_set(theme_bw()) # ggplot2のテーマを指定
 
 # データの用意 ------------------------------------------------------------------
 source(here("_pins.R"))
+df_animal <-
+  pins_resources_online |> 
+  pins::pin_download("tokushima_zoo_animals22") |> 
+  read_csv(col_types = "ccdd")
+
 df_ssdse_c <- 
   pins_resources_online |> 
   pins::pin_download("ssdse_c") |> 
   read_ssdse_c(lang = "ja")
 
-# クラスタリング -----------------------------------------------------------------
+# クラスタリング（k-平均法） -----------------------------------------------------------------
+# クラスタ（集団）の数 k を事前に決定する
+cluster_res <-
+  df_animal[, c(3, 4)] |> 
+  mutate(across(.cols = c(body_length_cm, weight_kg),
+                .fns = ~ c(scale(.x)))) |> 
+  filter(!is.na(body_length_cm), !is.na(weight_kg)) |> 
+  stats::kmeans(centers = 4)
 
+df_animal_x <- 
+  df_animal |> 
+  filter(!is.na(body_length_cm), !is.na(weight_kg)) |> 
+  mutate(cluster =  cluster_res$cluster)
+p <- 
+  ggplot(df_animal_x, 
+       aes(x = body_length_cm, y = weight_kg, colour = factor(cluster))) + 
+  geom_point()
 
+df_center <- 
+  df_animal_x %>% 
+  group_by(cluster) %>%
+  summarize(across(.cols = c(body_length_cm, weight_kg),
+                   .fns = mean))
+
+p +
+  geom_point(data = df_center, 
+             aes(x = body_length_cm, y = weight_kg, colour = factor(cluster)), 
+             shape = 3,
+             size = 3)
 
 # 因子分析 --------------------------------------------------------------------
 d <- 
