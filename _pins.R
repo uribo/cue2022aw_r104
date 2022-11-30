@@ -9,4 +9,5 @@ pins_resources_local <-
 pins_resources_online <-
   pins::board_url(c(
     "ssdse_b" = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.csv",
+    "ssdse_c" = "https://www.nstac.go.jp/sys/files/SSDSE-C-2022.csv",
     "tokushima_zoo_animals22" = "https://raw.githubusercontent.com/uribo/tokupon_ds/main/data-raw/tokushima_zoo_animals22.csv"))
