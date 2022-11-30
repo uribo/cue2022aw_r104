@@ -16,10 +16,28 @@ df_animal <-
   pins::pin_download("tokushima_zoo_animals22") |> 
   read_csv(col_types = "ccdd")
 
+df_animal_tiny <- 
+  df_animal |>
+  select(body_length_cm, weight_kg) |> 
+  # 欠損値を含む行を削除
+  tidyr::drop_na()
+
 df_ssdse_c <- 
   pins_resources_online |> 
   pins::pin_download("ssdse_c") |> 
   read_ssdse_c(lang = "ja")
+
+df_ssdse_c_tiny <-
+  df_ssdse_c |>
+  # 麺類の変数名だけを選択
+  select(2, 10, 11, 12, 13, 14, 15, 16) |> 
+  filter(都道府県 != "全国")
+
+df_ssdse_c_tiny <- 
+  df_ssdse_c_tiny |> 
+  tibble::column_to_rownames("都道府県") |> 
+  purrr::set_names(names(df_ssdse_c_tiny)[-1] |> 
+                     stringr::str_remove("01_穀類"))
 
 # クラスタリング（k-平均法） -----------------------------------------------------------------
 # データの特徴からグループ分けを行いたい
@@ -29,10 +47,6 @@ df_animal_tiny |>
   geom_point()
 
 # クラスタ（集団）の数 k を事前に決定する
-df_animal_tiny <- 
-  df_animal[, c(3, 4)] |> 
-  # 欠損値を含む行を削除
-  tidyr::drop_na()
 set.seed(123)
 cluster_res <-
   df_animal_tiny |> 
@@ -146,47 +160,59 @@ res_metrics |>
   scale_x_continuous(breaks = 1:10)
 
 # 主成分分析 -------------------------------------------------------------------
-# 主成分軸
-# # 寄与率（80%以上が目安）
-# colnames(df_ssdse_c)[c(10, 11, 12, 13, 14, 15, 16)]
-# colnames(df_ssdse_c)
-# colnames(df_ssdse_c)[c(21, 24, 28, 33, 34, 40, 43)]
-
-df_ssdse_c_tiny <-
-  df_ssdse_c |>
-  # 麺類の変数名だけを選択
-  select(2, 10, 11, 12, 13, 14, 15, 16) |> 
-  filter(都道府県 != "全国")
-
-df_ssdse_c_tiny <- 
-  df_ssdse_c_tiny |> 
-  tibble::column_to_rownames("都道府県") |> 
-  purrr::set_names(names(df_ssdse_c_tiny)[-1] |> 
-                     stringr::str_remove("01_穀類"))
-
+# 主成分分析の実行
 pca_res <-
+  # scale. = TRUEの指定により変数の標準化が行われ、
+  # 相関行列から固有値が計算される
+  # scale. = FALSEの場合、分散共分散行列から主成分分析が行われる
   prcomp(df_ssdse_c_tiny, scale. = TRUE)
-# Cumulative Proportion 累積寄与率を確認 ... 第三種成分軸までで元データの分散のおよそ70%を説明
+# 主成分分析の結果を確認（要約）
+# Standard deviation 各主成分の標準偏差... 該当する主成分がもつ情報量
+# Proportion of Variance 寄与率
+# Cumulative Proportion 累積寄与率
+# ... 第3主成分までで元データの分散のおよそ70%を説明（80%以上が目安）
 summary(pca_res)
-plot(pca_res)
-plot(pca_res, type = "l")
-# 第1主成分得点が最も高いのは山形県
+
+# 主成分得点の視覚化
+biplot(pca_res)
+# 第1主成分得点(PC1)が最も高いのは山形県
 # 山形県は麺類全般に対して支出している
+# 山形県、岩手県、神奈川県、埼玉県
 # 香川県は第2主成分得点が最も低い
 # 香川県は「生うどん・そば」に対する支出が特徴的
-biplot(pca_res)
+
+plot(pca_res)
+plot(pca_res, type = "l")
 
 # pca_res$sdev
+# 固有ベクトル
 # pca_res$rotation |> 
 #   as.data.frame() |> 
 #   tibble::rownames_to_column(var = "都道府県") |> 
 #   tibble::as_tibble()
 
+# 主成分得点
+# 
 pca_score <- 
-  pca_res$x[, 1:2] |>  # 第一、第二主成分得点
+  pca_res$x |>  
   tibble::as_tibble() |> 
+  select(PC1, PC2) |> # 第一、第二主成分得点
   mutate(prefecture = rownames(df_ssdse_c_tiny)) |> 
   relocate(prefecture, .before = 1)
+
+# 主成分得点から平均、分散を計算。分散 --> 固有値
+pca_score |> 
+  summarise(across(.cols = c(PC1, PC2),
+                   .fns = list(mean = mean, sd = sd))) |> 
+  as.data.frame()
+
+# 主成分得点は i 主成分の値と標準化した各変数の値から求められる
+# 北海道
+sum(df_ssdse_c_tiny |> 
+      mutate(across(everything(),.fns = scale)) |> 
+      slice(1L) * pca_res$rotation[,1])
+pca_score$PC1[1]
+
 pca_score |> 
   slice_max(order_by = PC1,
             n = 5)
