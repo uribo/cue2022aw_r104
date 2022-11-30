@@ -146,6 +146,16 @@
       "Hash": "e9c08b94391e9f3f97355841229124f2",
       "Requirements": []
     },
+    "RcppArmadillo": {
+      "Package": "RcppArmadillo",
+      "Version": "0.11.4.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5fa867879a70ed6df6ae4ed7f392fba2",
+      "Requirements": [
+        "Rcpp"
+      ]
+    },
     "RcppEigen": {
       "Package": "RcppEigen",
       "Version": "0.3.3.9.3",
@@ -155,6 +165,39 @@
       "Requirements": [
         "Matrix",
         "Rcpp"
+      ]
+    },
+    "RcppGSL": {
+      "Package": "RcppGSL",
+      "Version": "0.3.12",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c4900ef02a5f2dc6eafd0330a25ab0e0",
+      "Requirements": [
+        "Rcpp"
+      ]
+    },
+    "RcppZiggurat": {
+      "Package": "RcppZiggurat",
+      "Version": "0.1.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "75b4a36aeeed440ad03b996081190703",
+      "Requirements": [
+        "Rcpp",
+        "RcppGSL"
+      ]
+    },
+    "Rfast": {
+      "Package": "Rfast",
+      "Version": "2.0.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "330d7a6d1f7062cc49e68c7d4797bb75",
+      "Requirements": [
+        "Rcpp",
+        "RcppArmadillo",
+        "RcppZiggurat"
       ]
     },
     "SQUAREM": {
@@ -687,6 +730,18 @@
       "Repository": "CRAN",
       "Hash": "38ec653c2613bed60052ba3787bd8a2c",
       "Requirements": []
+    },
+    "flexclust": {
+      "Package": "flexclust",
+      "Version": "1.4-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5119656cf1990993d4100e5e407f90ac",
+      "Requirements": [
+        "class",
+        "lattice",
+        "modeltools"
+      ]
     },
     "forcats": {
       "Package": "forcats",
@@ -1373,6 +1428,14 @@
         "tidyselect",
         "vctrs"
       ]
+    },
+    "modeltools": {
+      "Package": "modeltools",
+      "Version": "0.2-23",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f5a957c02222589bdf625a67be68b2a9",
+      "Requirements": []
     },
     "munsell": {
       "Package": "munsell",
@@ -2201,6 +2264,33 @@
         "pillar",
         "pkgconfig",
         "rlang",
+        "vctrs"
+      ]
+    },
+    "tidyclust": {
+      "Package": "tidyclust",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "10fa1d53238aa7c4f7405f48f200eafe",
+      "Requirements": [
+        "Rfast",
+        "cli",
+        "dials",
+        "dplyr",
+        "flexclust",
+        "foreach",
+        "generics",
+        "glue",
+        "hardhat",
+        "modelenv",
+        "parsnip",
+        "prettyunits",
+        "rlang",
+        "rsample",
+        "tibble",
+        "tidyr",
+        "tune",
         "vctrs"
       ]
     },
