@@ -152,34 +152,28 @@ res_metrics |>
 # colnames(df_ssdse_c)
 # colnames(df_ssdse_c)[c(21, 24, 28, 33, 34, 40, 43)]
 
-# df_ssdse_c <- 
-#   df_ssdse_c |> 
-#   # 麺類の変数名だけを選択
-#   select(2, 10, 11, 12, 13, 14, 15, 16)
-
-# df_ssdse_c <- 
-#   df_ssdse_c |>
-#   select(`都道府県`, matches("^06_果物.+")) |> 
-#   select(!`06_果物果物加工品`)
-
-# df_ssdse_c <-
-#   df_ssdse_c |>
-#   purrr::set_names(names(df_ssdse_c) |>
-#                      stringr::str_remove(".+_(魚介類|穀類)"))
+df_ssdse_c_tiny <-
+  df_ssdse_c |>
+  # 麺類の変数名だけを選択
+  select(2, 10, 11, 12, 13, 14, 15, 16) |> 
+  filter(都道府県 != "全国")
 
 df_ssdse_c_tiny <- 
-  tibble::column_to_rownames(df_ssdse_c_tiny, "都道府県")
+  df_ssdse_c_tiny |> 
+  tibble::column_to_rownames("都道府県") |> 
+  purrr::set_names(names(df_ssdse_c_tiny)[-1] |> 
+                     stringr::str_remove("01_穀類"))
 
 pca_res <-
-  prcomp(df_ssdse_c_tiny)
-# 第二種成分軸までで元データの分散のおよそ70%を説明
+  prcomp(df_ssdse_c_tiny, scale. = TRUE)
+# Cumulative Proportion 累積寄与率を確認 ... 第三種成分軸までで元データの分散のおよそ70%を説明
 summary(pca_res)
 plot(pca_res)
 plot(pca_res, type = "l")
-# 第1主成分得点が最も高いのは山形市（山形県）
-# 高松市（香川県）は第1主成分得点、第2主成分得点ともに高い
-# 高松市（香川県）は「生うどん・そば」に対する支出が特徴的
-# 山形市（山形県）は麺類全般に対して支出している
+# 第1主成分得点が最も高いのは山形県
+# 山形県は麺類全般に対して支出している
+# 香川県は第2主成分得点が最も低い
+# 香川県は「生うどん・そば」に対する支出が特徴的
 biplot(pca_res)
 
 # pca_res$sdev
@@ -189,13 +183,17 @@ biplot(pca_res)
 #   tibble::as_tibble()
 
 pca_score <- 
-  pca_res$x[, 1:2] # 第一、第二主成分得点
-
-pca_score <- 
-  pca_score |> 
+  pca_res$x[, 1:2] |>  # 第一、第二主成分得点
   tibble::as_tibble() |> 
   mutate(prefecture = rownames(df_ssdse_c_tiny)) |> 
   relocate(prefecture, .before = 1)
+pca_score |> 
+  slice_max(order_by = PC1,
+            n = 5)
+pca_score |>
+  arrange(desc(PC2)) |> 
+  mutate(rank = row_number()) |> 
+  filter(prefecture == "香川県")
 
 pca_score |> 
   ggplot() +
@@ -204,8 +202,18 @@ pca_score |>
   geom_text_repel(aes(label = prefecture))
 
 pca_res$rotation
-# 生うどん・そば、乾うどん・そばの値が大きくなると第一、第二主成分得点が小さくなる
+# 「生うどん・そば」、「乾うどん・そば」の値が大きくなると第一主成分得点が大きく、第二主成分得点が小さくなる
+# 「パスタ」の値が大きくなると第二主成分得点も大きくなる
 round(pca_res$rotation, digits = 2)
+
+df_ssdse_c_tiny |> 
+  ggplot() +
+  aes(`生うどん・そば`, `乾うどん・そば`) +
+  geom_point()
+df_ssdse_c_tiny |> 
+  ggplot() +
+  aes(`生うどん・そば`, `即席麺`) +
+  geom_point()
 
 pca_res$x[1, 1]
 # sum(df_ssdse_c[1, ] * pca_res$rotation[, 1])
