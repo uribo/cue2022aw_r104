@@ -1,6 +1,6 @@
 cmake
 libharfbuzz-dev
 libfribidi-dev
-libgsl2-dev
+libudunits2-dev
 fonts-noto-cjk
 fonts-noto-cjk-extra
