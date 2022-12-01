@@ -98,66 +98,66 @@ df_animal_x %>%
   summarize(across(.cols = c(body_length_cm, weight_kg),
                    .fns = mean))
 
-# tidymodelsの枠組み tidyclustパッケージで行う
-library(tidymodels)
-library(tidyclust)
-kmeans_spec <- 
-  k_means(num_clusters = 4) |> 
-  set_engine("stats")
-kmeans_spec_fit <- 
-  kmeans_spec |> 
-  fit(~ ., data = df_animal_tiny)
-kmeans_spec_fit
-
-predict(kmeans_spec_fit,
-        df_animal_tiny)
-augment(kmeans_spec_fit,
-        df_animal_tiny) |> 
-  ggplot() + 
-  aes(x = body_length_cm, y = weight_kg, colour = .pred_cluster) +
-  geom_point()
-
+# # tidymodelsの枠組み tidyclustパッケージで行う
+# library(tidymodels)
+# library(tidyclust)
+# kmeans_spec <- 
+#   k_means(num_clusters = 4) |> 
+#   set_engine("stats")
+# kmeans_spec_fit <- 
+#   kmeans_spec |> 
+#   fit(~ ., data = df_animal_tiny)
+# kmeans_spec_fit
+# 
+# predict(kmeans_spec_fit,
+#         df_animal_tiny)
 # augment(kmeans_spec_fit,
-#         df_animal_tiny) %>% 
-#   group_by(.pred_cluster) %>%
-#   summarize(across(.cols = c(body_length_cm, weight_kg),
-#                    .fns = mean))
-
-extract_centroids(kmeans_spec_fit)
-
-
-animal_cv <- 
-  vfold_cv(df_animal_tiny, v = 5)
-kmeans_spec <- 
-  k_means(num_clusters = tune())
-animal_rec <- 
-  recipe(~ body_length_cm + weight_kg, data = df_animal_tiny)
-
-kmeans_wflow <- 
-  workflow(animal_rec, kmeans_spec)
-clust_num_grid <- grid_regular(num_clusters(),
-                               levels = 10)
-res <- tune_cluster(
-  kmeans_wflow,
-  # 交差検証用データを指定
-  resamples = animal_cv,
-  grid = clust_num_grid,
-  control = control_grid(save_pred = TRUE, extract = identity),
-  metrics = cluster_metric_set(sse_within_total, sse_total, sse_ratio))
-res
-res_metrics <- 
-  res |> 
-  collect_metrics()
-res_metrics
-
-res_metrics |> 
-  filter(.metric == "sse_ratio") |> 
-  ggplot(aes(x = num_clusters, y = mean)) +
-  geom_point() +
-  geom_line() +
-  ylab("mean WSS/TSS ratio, over 5 folds") +
-  xlab("Number of clusters") +
-  scale_x_continuous(breaks = 1:10)
+#         df_animal_tiny) |> 
+#   ggplot() + 
+#   aes(x = body_length_cm, y = weight_kg, colour = .pred_cluster) +
+#   geom_point()
+# 
+# # augment(kmeans_spec_fit,
+# #         df_animal_tiny) %>% 
+# #   group_by(.pred_cluster) %>%
+# #   summarize(across(.cols = c(body_length_cm, weight_kg),
+# #                    .fns = mean))
+# 
+# extract_centroids(kmeans_spec_fit)
+# 
+# 
+# animal_cv <- 
+#   vfold_cv(df_animal_tiny, v = 5)
+# kmeans_spec <- 
+#   k_means(num_clusters = tune())
+# animal_rec <- 
+#   recipe(~ body_length_cm + weight_kg, data = df_animal_tiny)
+# 
+# kmeans_wflow <- 
+#   workflow(animal_rec, kmeans_spec)
+# clust_num_grid <- grid_regular(num_clusters(),
+#                                levels = 10)
+# res <- tune_cluster(
+#   kmeans_wflow,
+#   # 交差検証用データを指定
+#   resamples = animal_cv,
+#   grid = clust_num_grid,
+#   control = control_grid(save_pred = TRUE, extract = identity),
+#   metrics = cluster_metric_set(sse_within_total, sse_total, sse_ratio))
+# res
+# res_metrics <- 
+#   res |> 
+#   collect_metrics()
+# res_metrics
+# 
+# res_metrics |> 
+#   filter(.metric == "sse_ratio") |> 
+#   ggplot(aes(x = num_clusters, y = mean)) +
+#   geom_point() +
+#   geom_line() +
+#   ylab("mean WSS/TSS ratio, over 5 folds") +
+#   xlab("Number of clusters") +
+#   scale_x_continuous(breaks = 1:10)
 
 # 主成分分析 -------------------------------------------------------------------
 # 主成分分析の実行
@@ -174,6 +174,7 @@ pca_res <-
 summary(pca_res)
 
 # 主成分得点の視覚化
+# 主成分空間（第一主成分、第二主成分を両軸にとる）に主成分得点をプロット
 biplot(pca_res)
 # 第1主成分得点(PC1)が最も高いのは山形県
 # 山形県は麺類全般に対して支出している
