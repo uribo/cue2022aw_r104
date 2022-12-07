@@ -71,3 +71,19 @@ as_tsibble(df_covid19_japan) |>
   as.ts() |> 
   stl("per") |> 
   plot()
+
+# library(tsibble)
+# library(feasts)
+# dcmp <- 
+#   as_tsibble(df_covid19_japan) %>%
+#   model(STL(cases_new ~ season(window = Inf)))
+# components(dcmp) |> 
+#   autoplot()
+
+# 地理空間データ -----------------------------------------------------------------
+library(sf)
+library(mapview)
+library(jmastats)
+library(rnaturalearth)
+library(rnaturalearthhires)
+
