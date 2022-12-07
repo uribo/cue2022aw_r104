@@ -1,6 +1,6 @@
 bioconductor.version:
 external.libraries:
-ignored.packages: estatapi, httr2, jmastats, sf, gifski, gganimate
+ignored.packages: estatapi, httr2, gifski, gganimate
 package.dependency.fields: Imports, Depends, LinkingTo
 r.version:
 snapshot.type: implicit

@@ -26,11 +26,6 @@ df_shikoku_kome_sisyutu2019to2021 <-
   pins::pin_read("shikoku_kome_sisyutu2019to2021") |> 
   as_tibble()
 
-df_shikoku_weather2019to2021 <-
-  pins_resources_local |> 
-  pins::pin_read("shikoku_weather2019to2021") |> 
-  as_tibble()
-
 df_ssdse_b2019 <- 
   pins_resources_online |> 
   pins::pin_download("ssdse_b") |> 
