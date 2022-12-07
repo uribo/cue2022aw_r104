@@ -475,6 +475,44 @@
         "tibble"
       ]
     },
+    "countrycode": {
+      "Package": "countrycode",
+      "Version": "1.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2d162e8f29eec5526e362a7415d980ab",
+      "Requirements": []
+    },
+    "covidregionaldata": {
+      "Package": "covidregionaldata",
+      "Version": "0.9.3",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "epiforecasts",
+      "RemoteRepo": "covidregionaldata",
+      "RemoteRef": "master",
+      "RemoteSha": "bc7bc24761ccc8acbfcd9380553696eaf5ce524e",
+      "Hash": "3f5a477c70739139e13e585103b55e2b",
+      "Requirements": [
+        "R6",
+        "countrycode",
+        "dplyr",
+        "httr",
+        "jsonlite",
+        "lifecycle",
+        "lubridate",
+        "memoise",
+        "purrr",
+        "readxl",
+        "rlang",
+        "stringr",
+        "tidyr",
+        "tidyselect",
+        "vroom",
+        "xml2"
+      ]
+    },
     "cpp11": {
       "Package": "cpp11",
       "Version": "0.4.3",
