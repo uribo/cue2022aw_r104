@@ -74,16 +74,27 @@
 
 ### 第四週: データサイエンス入門(2)
 
+<p align="center">
+スライド |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/week4.R">Rスクリプト</a>
+</p>
+
 - 主成分分析
     - 主成分軸
 - クラスタリング
     - k-平均法
-- 時系列データ
 
 ### 第五週（最終週）
 
-- （前の週までの積み残し）
-- ツールの使い方
+<p align="center">
+スライド |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/week5.R">Rスクリプト</a>
+</p>
+
+
+- 時系列データ
+- 地理空間データ
+- レポート作成
 - 振り返り
 
 ## 実行環境
