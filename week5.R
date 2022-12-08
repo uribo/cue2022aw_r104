@@ -5,6 +5,13 @@ library(tidyverse) # データ分析全般
 library(here) # フォルダ、ファイルの指定を簡易に
 library(ssdse)
 library(patchwork)
+library(tsibble) # 時系列データへの変換
+library(feasts) # 時系列データ操作
+library(sf) # 地理空間データへの変換、演算
+library(mapview)
+library(jmastats)
+library(rnaturalearth)
+library(rnaturalearthhires)
 library(covidregionaldata) # 新型コロナウイルス感染症感染者数
 course_colors <- c("#364968", "#fddf97", "#e09664", "#6c4343", "#ffffff")
 theme_set(theme_bw()) # ggplot2のテーマを指定
@@ -67,23 +74,82 @@ p1 + p2 + p3 +
 #        width = 15,
 #        height = 4)
 
-as_tsibble(df_covid19_japan) |> 
-  as.ts() |> 
-  stl("per") |> 
-  plot()
 
-# library(tsibble)
-# library(feasts)
-# dcmp <- 
-#   as_tsibble(df_covid19_japan) %>%
-#   model(STL(cases_new ~ season(window = Inf)))
-# components(dcmp) |> 
-#   autoplot()
+# STL分解
+as_tsibble(df_covid19_japan,
+           index = date) |>
+  as.ts() |>
+  stl("periodic") |>
+  plot()
+dcmp <-
+  as_tsibble(df_covid19_japan,
+             index = date) |> 
+  model(STL(cases_new ~ season(window = Inf)))
+components(dcmp) |>
+  autoplot()
+# ggsave(here("images/covid19_cases_tsl.png"),
+#        width = 5,
+#        height = 7)
 
 # 地理空間データ -----------------------------------------------------------------
-library(sf)
-library(mapview)
-library(jmastats)
-library(rnaturalearth)
-library(rnaturalearthhires)
+# 徳島駅の座標
+tksm_st_p <- 
+  st_point(c(134.55129, 34.07470))
+# plot(tksm_st_p)
+# 佐古駅の座標
+sako_st_p <- 
+  st_point(c(134.52978, 34.0806))
+# 徳島駅と佐古駅の間の線（直線）
+tksm_st_line <- 
+  st_linestring(
+  matrix(c(134.55129, 34.07470,
+           134.52978, 34.0806),
+         nrow = 2,
+         byrow = TRUE))
+# plot(tksm_st_line)
+# 北方領土を含めた国土
+jp_area <- 
+  matrix(
+  c(122.932502747, 20.42527771,
+    153.986663818, 20.42527771,
+    153.986663818, 45.557220459,
+    122.932502747, 45.557220459,
+    122.932502747, 20.42527771),
+  byrow = TRUE,
+  ncol = 2) |>  
+  list() |> 
+  st_polygon()
+# plot(jp_area)
 
+# 徳島駅と佐古駅のポイントに地理座標系（世界測地系）を指定する
+sfc_tksm_st_p <- 
+  st_sfc(tksm_st_p, crs = 4326)
+sfc_sako_st_p <- 
+  st_sfc(sako_st_p, crs = 4326)
+
+# 地図上にポイントをマッピング
+mapview(sfc_tksm_st_p) +
+  mapview(sfc_sako_st_p)
+
+# 座標参照系
+# 徳島駅と佐古駅の距離
+st_distance(
+  sfc_tksm_st_p,
+  sfc_sako_st_p)
+st_distance(
+  st_transform(sfc_tksm_st_p, crs = 6672),
+  st_transform(sfc_sako_st_p, crs = 6672))
+# バッファの生成
+# 地理座標系ではゆがみが生じる
+tksm_st_p |> 
+  st_sfc(crs = 4326) |> 
+  st_buffer(dist = units::set_units(1, km)) |> 
+  st_sf() |> 
+  mapview()
+tksm_st_p |> 
+  st_sfc(crs = 4326) |> 
+  st_transform(crs = 6672) |> 
+  st_buffer(dist = units::set_units(1, km)) |> 
+  st_transform(crs = 4326) |> 
+  st_sf() |> 
+  mapview()
