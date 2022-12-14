@@ -98,7 +98,7 @@ tksm_st_p <-
 # plot(tksm_st_p)
 # 佐古駅の座標
 sako_st_p <- 
-  st_point(c(134.52978, 34.0806))
+  st_point(c(134.53868, 34.08056))
 # 徳島駅と佐古駅の間の線（直線）
 tksm_st_line <- 
   st_linestring(
