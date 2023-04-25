@@ -77,7 +77,7 @@ paste0("今日", "の", "天気", "は",
 # destfile引数には保存する際のファイル名（パスを含むことができる）を指定する
 download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.csv", 
               # WindowsとUNIXとでパスの記述方法が異なるので注意
-              destfile = here::here("data-raw/SSDSE-B-2022.csv"))
+              destfile = here("data-raw/SSDSE-B-2022.csv"))
 download.file(url = "https://www.nstac.go.jp/sys/files/SSDSE-B-2022.xlsx", 
               destfile = here::here("data-raw/SSDSE-B-2022.xlsx"))
 
