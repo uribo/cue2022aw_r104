@@ -75,7 +75,7 @@
 ### 第四週: データサイエンス入門(2)
 
 <p align="center">
-スライド |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/slide/week4.pdf">スライド</a> |
 <a href="https://github.com/uribo/cue2022aw_r104/blob/main/week4.R">Rスクリプト</a>
 </p>
 
@@ -84,18 +84,15 @@
 - クラスタリング
     - k-平均法
 
-### 第五週（最終週）
+### 第五週（最終週）: さまざまなデータの扱い
 
 <p align="center">
-スライド |
+<a href="https://github.com/uribo/cue2022aw_r104/blob/main/slide/week5.pdf">スライド</a> |
 <a href="https://github.com/uribo/cue2022aw_r104/blob/main/week5.R">Rスクリプト</a>
 </p>
 
-
 - 時系列データ
 - 地理空間データ
-- レポート作成
-- 振り返り
 
 ## 実行環境
 
